@@ -1,37 +1,133 @@
-# 青隅
+# 清隅
 
-#### 介绍
-一个集合了多种实用工具的开源项目，旨在为开发者及个人提供便捷高效的工具服务。
+## 介绍
 
-#### 软件架构
-软件架构说明
+清隅是一个集合了多种实用工具的开源项目，旨在为开发者及个人提供便捷高效的工具服务。以 Flutter 为框架，支持多平台运行，包括 Android、Web 等。
 
+## 功能特点
 
-#### 安装教程
+### 核心功能
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+- **🔐 哈希计算器**：支持 SHA1、SHA256、SHA512、MD5 等多种哈希算法，可计算文本的哈希值，并提供历史记录功能
+- **📝 文本工具**：提供文本处理相关功能（开发中）
+- **🔄 单位转换**：支持各种单位之间的转换（开发中）
+- **📱 二维码生成**：将文本转换为二维码，方便快速分享信息
+- **🧮 计算器**：基础四则运算功能
 
-#### 使用说明
+### 特色功能
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+- **📱 响应式设计**：适配不同屏幕尺寸，在手机、平板和桌面设备上均有良好表现
+- **⭐工具收藏**：支持将常用工具添加到收藏夹，方便快速访问
+- **🔧 个性化设置**：提供多种主题和字体选择，满足个性化需求（开发中）
+- **🌙 深色模式**：支持系统深色模式，提供舒适的视觉体验（开发中）
 
-#### 参与贡献
+## 技术栈
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+- **前端框架**：Flutter 3.10+
+- **开发语言**：Dart
+- **状态管理**：GetX
+- **本地存储**：shared_preferences- **哈希计算**：crypto
+- **二维码生成**：qr_flutter
 
+## 安装教程
 
-#### 特技
+### 前提条件
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+- 安装 [Flutter SDK](https://docs.flutter.dev/get-started/install)
+- 安装 [Dart SDK](https://dart.dev/get-dart)
+- 配置好相应平台的开发环境（Android Studio等）
+
+### 步骤
+
+1. **克隆仓库**
+
+```bash
+git clone https://github.com/zfclark/qingyu.git
+cd qingyu
+```
+
+2. **安装依赖**
+
+```bash
+flutter pub get
+```
+
+3. **运行项目**
+
+- **Android**：连接设备后运行 `flutter run`
+- **Web**：运行 `flutter run -d web`
+
+## 使用说明
+
+### 哈希计算器
+
+1. 在输入框中输入或粘贴要计算哈希值的文本
+2. 选择要使用的哈希算法（SHA1、SHA256、SHA512、MD5）
+3. 点击「计算」按钮，系统会自动计算并显示哈希值
+4. 点击「复制结果」按钮可将计算结果复制到剪贴板
+5. 系统会自动保存计算历史，点击历史记录可快速复用之前的输入
+
+### 二维码生成
+
+1. 在输入框中输入要转换为二维码的文本
+2. 点击「生成二维码」按钮，系统会自动生成并显示二维码
+3. 点击「复制输入文本」按钮可将输入文本复制到剪贴板
+
+### 计算器
+
+1. 在计算器界面输入数字和运算符
+2. 点击「计算」按钮获取结果
+
+## 项目结构
+
+```
+qingyu/
+├── lib/
+│   ├── core/              # 核心配置和主题
+│   │   ├── app_config.dart
+│   │   └── app_theme.dart
+│   ├── data/              # 数据层
+│   │   ├── models/        # 数据模型
+│   │   └── services/      # 服务
+│   ├── features/          # 功能模块
+│   │   ├── daily_tools/   # 日常工具
+│   │   ├── hash_tools/    # 哈希工具
+│   │   ├── home/          # 首页
+│   │   ├── settings/      # 设置
+│   │   ├── text_tools/    # 文本工具
+│   │   └── unit_converter/ # 单位转换
+│   └── main.dart          # 应用入口
+├── android/               # Android 平台代码
+├── web/                   # Web 平台代码
+├── pubspec.yaml           # 依赖管理
+└── README.md              # 项目说明
+```
+
+## 参与贡献
+
+欢迎大家参与项目贡献！以下是贡献流程：
+
+1. **Fork 本仓库**
+2. **新建 Feat_xxx 分支**
+3. **提交代码**
+4. **新建 Pull Request**
+
+### 开发规范
+
+- 代码风格：遵循 Flutter 官方推荐的代码风格
+- 提交信息：清晰明了，描述本次提交的主要内容
+- 功能实现：确保功能完整，代码健壮
+- 测试：确保代码通过基本测试
+
+## 许可证
+
+本项目采用 MIT 许可证，详情请参阅 [LICENSE](LICENSE) 文件。
+
+## 联系方式
+
+- 项目地址：https://github.com/zfclark/qingyu
+- 问题反馈：https://github.com/zfclark/qingyu/issues
+
+---
+
+感谢您使用清隅工具箱！如果您有任何建议或问题，欢迎随时反馈。
