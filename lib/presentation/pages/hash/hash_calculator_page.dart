@@ -1,32 +1,32 @@
-/// Hash Calculator Tool
+/// Hash Calculator Page
 /// Author: ZF_Clark
-/// Description: Unified hash calculation tool supporting multiple algorithms including SHA1, SHA256, SHA512, and MD5. Provides text input, hash calculation, result copying, and history recording functionality
-/// Last Modified: 2026/02/04
-/// Version: V0.1
+/// Description: UI page for hash calculation. Uses HashUtil for calculation logic and StorageService for data persistence. Provides text input, algorithm selection, result display, and history management.
+/// Last Modified: 2026/02/08
 library;
 
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:crypto/crypto.dart';
-import '../../data/services/storage_service.dart';
-import '../../data/models/hash_history.dart';
+import '/core/utils/hash_util.dart';
+import '/core/services/storage_service.dart';
+import '/data/models/hash_history_model.dart';
 
-class HashCalculator extends StatefulWidget {
-  const HashCalculator({super.key});
+/// 哈希计算器页面
+/// 提供哈希计算功能的UI界面
+class HashCalculatorPage extends StatefulWidget {
+  const HashCalculatorPage({super.key});
 
   @override
-  State<HashCalculator> createState() => _HashCalculatorState();
+  State<HashCalculatorPage> createState() => _HashCalculatorPageState();
 }
 
-class _HashCalculatorState extends State<HashCalculator> {
+class _HashCalculatorPageState extends State<HashCalculatorPage> {
   final TextEditingController _inputController = TextEditingController();
   String _result = '';
-  List<HashHistory> _history = [];
+  List<HashHistoryModel> _history = [];
   String _selectedAlgorithm = 'SHA256';
 
-  /// Available hash algorithms
-  final List<String> _algorithms = ['SHA1', 'SHA256', 'SHA512', 'MD5'];
+  /// 可用的哈希算法列表
+  final List<String> _algorithms = HashUtil.supportedAlgorithms;
 
   @override
   void initState() {
@@ -34,54 +34,34 @@ class _HashCalculatorState extends State<HashCalculator> {
     _loadHistory();
   }
 
-  /// Load calculation history from storage
+  /// 从存储加载历史记录
   void _loadHistory() {
     setState(() {
       _history = StorageService.getHashHistory();
     });
   }
 
-  /// Calculate hash based on selected algorithm
+  /// 执行哈希计算
   void _calculateHash() {
     if (_inputController.text.isEmpty) return;
 
-    final input = _inputController.text;
-    final bytes = utf8.encode(input);
-    String hashString;
-
-    switch (_selectedAlgorithm) {
-      case 'SHA1':
-        final hash = sha1.convert(bytes);
-        hashString = hash.toString();
-        break;
-      case 'SHA256':
-        final hash = sha256.convert(bytes);
-        hashString = hash.toString();
-        break;
-      case 'SHA512':
-        final hash = sha512.convert(bytes);
-        hashString = hash.toString();
-        break;
-      case 'MD5':
-        final hash = md5.convert(bytes);
-        hashString = hash.toString();
-        break;
-      default:
-        final hash = sha256.convert(bytes);
-        hashString = hash.toString();
-    }
+    // 使用工具类执行计算
+    final hashString = HashUtil.calculateHash(
+      _inputController.text,
+      _selectedAlgorithm,
+    );
 
     setState(() {
       _result = hashString;
     });
 
-    // Save to history
-    _saveToHistory(input, hashString);
+    // 保存到历史记录
+    _saveToHistory(_inputController.text, hashString);
   }
 
-  /// Save calculation to history
+  /// 保存计算到历史记录
   void _saveToHistory(String input, String hash) {
-    final historyItem = HashHistory(
+    final historyItem = HashHistoryModel(
       input: input,
       hash: hash,
       algorithm: _selectedAlgorithm,
@@ -98,7 +78,7 @@ class _HashCalculatorState extends State<HashCalculator> {
     StorageService.saveHashHistory(_history);
   }
 
-  /// Copy result to clipboard
+  /// 复制结果到剪贴板
   void _copyResult() {
     if (_result.isEmpty) return;
 
@@ -108,7 +88,7 @@ class _HashCalculatorState extends State<HashCalculator> {
     ).showSnackBar(const SnackBar(content: Text('结果已复制到剪贴板')));
   }
 
-  /// Clear input field
+  /// 清空输入
   void _clearInput() {
     setState(() {
       _inputController.clear();
@@ -116,7 +96,7 @@ class _HashCalculatorState extends State<HashCalculator> {
     });
   }
 
-  /// Clear history
+  /// 清空历史记录
   void _clearHistory() {
     setState(() {
       _history.clear();
@@ -132,7 +112,7 @@ class _HashCalculatorState extends State<HashCalculator> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Algorithm selection
+            // 算法选择区域
             Card(
               elevation: 0,
               shape: RoundedRectangleBorder(
@@ -168,7 +148,7 @@ class _HashCalculatorState extends State<HashCalculator> {
 
             const SizedBox(height: 16),
 
-            // Input section
+            // 输入区域
             Card(
               elevation: 0,
               shape: RoundedRectangleBorder(
@@ -214,7 +194,7 @@ class _HashCalculatorState extends State<HashCalculator> {
 
             const SizedBox(height: 16),
 
-            // Result section
+            // 结果区域
             if (_result.isNotEmpty)
               Card(
                 elevation: 0,
@@ -252,7 +232,7 @@ class _HashCalculatorState extends State<HashCalculator> {
 
             const SizedBox(height: 16),
 
-            // History section
+            // 历史记录区域
             Expanded(
               child: Card(
                 elevation: 0,

@@ -1,8 +1,7 @@
 /// App theme configuration
 /// Author: ZF_Clark
 /// Description: Provides Material 3 theme settings for light and dark modes, including color schemes, text styles, and button themes
-/// Last Modified: 2026/02/04
-/// Version: V0.1
+/// Last Modified: 2026/02/08
 library;
 
 import 'package:flutter/material.dart';

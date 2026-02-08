@@ -1,43 +1,50 @@
-/// App entry
+/// Main Application Entry
 /// Author: ZF_Clark
-/// Description: Initializes storage service and sets up the application
-/// Last Modified: 2026/02/04
-/// Version: V0.1
+/// Description: Initializes storage service and sets up the application with proper theming and routing.
+/// Last Modified: 2026/02/08
 library;
 
 import 'package:flutter/material.dart';
-import 'core/app_theme.dart';
-import 'core/app_config.dart';
-import 'data/services/storage_service.dart';
-import 'features/home/home_page.dart';
+import 'app/config/app_theme.dart';
+import 'app/config/app_config.dart';
+import 'core/services/storage_service.dart';
+import 'presentation/pages/home/home_page.dart';
 
+/// 应用程序入口
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Initialize storage service
+
+  // 初始化存储服务
   await StorageService.initialize();
 
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
+/// 主应用组件
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Get theme mode from storage
-    final themeMode = _getThemeModeFromStorage();
+  State<MainApp> createState() => _MainAppState();
+}
 
-    return MaterialApp(
-      title: AppConfig.appName,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: themeMode,
-      home: const HomePage(),
-      debugShowCheckedModeBanner: false,
-    );
+class _MainAppState extends State<MainApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadThemeMode();
   }
 
-  /// Get theme mode from storage
+  /// 加载主题模式
+  void _loadThemeMode() {
+    setState(() {
+      _themeMode = _getThemeModeFromStorage();
+    });
+  }
+
+  /// 从存储获取主题模式
   ThemeMode _getThemeModeFromStorage() {
     final themeModeString = StorageService.getThemeMode();
     switch (themeModeString) {
@@ -49,5 +56,22 @@ class MainApp extends StatelessWidget {
       default:
         return ThemeMode.system;
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: AppConfig.appName,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: _themeMode,
+      home: HomePage(
+        onThemeChanged: () {
+          // 主题变更时重新加载
+          _loadThemeMode();
+        },
+      ),
+      debugShowCheckedModeBanner: false,
+    );
   }
 }

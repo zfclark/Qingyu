@@ -1,27 +1,28 @@
-/// Text Tools
+/// Text Tools Page
 /// Author: ZF_Clark
-/// Description: Provides text processing utilities including case conversion (uppercase, lowercase, capitalize), whitespace removal (spaces, newlines, all whitespace), character count with detailed statistics, and Base64 encoding/decoding functionality
-/// Last Modified: 2026/02/04
-/// Version: V0.1
+/// Description: UI page for text processing tools. Uses TextUtil for text manipulation logic. Provides case conversion, whitespace removal, character statistics, and Base64 encoding/decoding.
+/// Last Modified: 2026/02/08
 library;
 
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../core/utils/text_util.dart';
 
-class TextTools extends StatefulWidget {
-  const TextTools({super.key});
+/// 文本工具页面
+/// 提供文本处理功能的UI界面
+class TextToolsPage extends StatefulWidget {
+  const TextToolsPage({super.key});
 
   @override
-  State<TextTools> createState() => _TextToolsState();
+  State<TextToolsPage> createState() => _TextToolsPageState();
 }
 
-class _TextToolsState extends State<TextTools> {
+class _TextToolsPageState extends State<TextToolsPage> {
   final TextEditingController _inputController = TextEditingController();
   String _output = '';
   int _currentTab = 0;
 
-  /// Tab options
+  /// 标签页选项
   final List<String> _tabs = ['大小写转换', '空格处理', '字符统计', 'Base64', '批量操作'];
 
   @override
@@ -32,7 +33,7 @@ class _TextToolsState extends State<TextTools> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Tab bar
+            // 标签栏
             DefaultTabController(
               length: _tabs.length,
               initialIndex: _currentTab,
@@ -49,7 +50,7 @@ class _TextToolsState extends State<TextTools> {
             ),
             const SizedBox(height: 16),
 
-            // Input section
+            // 输入区域
             Card(
               elevation: 0,
               shape: RoundedRectangleBorder(
@@ -90,7 +91,7 @@ class _TextToolsState extends State<TextTools> {
 
             const SizedBox(height: 16),
 
-            // Output section
+            // 输出区域
             if (_output.isNotEmpty)
               Card(
                 elevation: 0,
@@ -107,7 +108,9 @@ class _TextToolsState extends State<TextTools> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: SelectableText(_output),
@@ -125,7 +128,7 @@ class _TextToolsState extends State<TextTools> {
 
             const SizedBox(height: 16),
 
-            // Character count
+            // 字符统计
             Card(
               elevation: 0,
               shape: RoundedRectangleBorder(
@@ -137,8 +140,8 @@ class _TextToolsState extends State<TextTools> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('字符数：${_inputController.text.length}'),
-                    Text('单词数：${_countWords()}'),
-                    Text('行数：${_countLines()}'),
+                    Text('单词数：${TextUtil.countWords(_inputController.text)}'),
+                    Text('行数：${TextUtil.countLines(_inputController.text)}'),
                   ],
                 ),
               ),
@@ -149,35 +152,35 @@ class _TextToolsState extends State<TextTools> {
     );
   }
 
-  /// Build action button based on current tab
+  /// 根据当前标签构建操作按钮
   Widget _buildActionButton() {
     switch (_currentTab) {
-      case 0: // Case conversion
+      case 0: // 大小写转换
         return Row(
           children: [
             Expanded(
               child: ElevatedButton(
-                onPressed: () => _convertCase('uppercase'),
+                onPressed: () => _convertCase(TextCaseType.uppercase),
                 child: const Text('转大写'),
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: ElevatedButton(
-                onPressed: () => _convertCase('lowercase'),
+                onPressed: () => _convertCase(TextCaseType.lowercase),
                 child: const Text('转小写'),
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: ElevatedButton(
-                onPressed: () => _convertCase('capitalize'),
+                onPressed: () => _convertCase(TextCaseType.capitalize),
                 child: const Text('首字母大写'),
               ),
             ),
           ],
         );
-      case 1: // Whitespace processing
+      case 1: // 空格处理
         return Row(
           children: [
             Expanded(
@@ -202,7 +205,7 @@ class _TextToolsState extends State<TextTools> {
             ),
           ],
         );
-      case 2: // Character count
+      case 2: // 字符统计
         return ElevatedButton(
           onPressed: _showDetailedCount,
           child: const Text('详细统计'),
@@ -235,66 +238,37 @@ class _TextToolsState extends State<TextTools> {
     }
   }
 
-  /// Convert case
-  void _convertCase(String type) {
-    final input = _inputController.text;
-    String result;
-
-    switch (type) {
-      case 'uppercase':
-        result = input.toUpperCase();
-        break;
-      case 'lowercase':
-        result = input.toLowerCase();
-        break;
-      case 'capitalize':
-        if (input.isEmpty) {
-          result = '';
-        } else {
-          result =
-              input.substring(0, 1).toUpperCase() +
-              input.substring(1).toLowerCase();
-        }
-        break;
-      default:
-        result = input;
-    }
-
+  /// 转换大小写
+  void _convertCase(TextCaseType type) {
     setState(() {
-      _output = result;
+      _output = TextUtil.convertCase(_inputController.text, type);
     });
   }
 
-  /// Remove spaces
+  /// 移除空格
   void _removeSpaces() {
     setState(() {
-      _output = _inputController.text.replaceAll(' ', '');
+      _output = TextUtil.removeSpaces(_inputController.text);
     });
   }
 
-  /// Remove newlines
+  /// 移除换行符
   void _removeNewlines() {
     setState(() {
-      _output = _inputController.text.replaceAll('\n', '').replaceAll('\r', '');
+      _output = TextUtil.removeNewlines(_inputController.text);
     });
   }
 
-  /// Remove all whitespace
+  /// 移除所有空白字符
   void _removeAllWhitespace() {
     setState(() {
-      _output = _inputController.text.replaceAll(RegExp(r'\s+'), '');
+      _output = TextUtil.removeAllWhitespace(_inputController.text);
     });
   }
 
-  /// Show detailed character count
+  /// 显示详细统计
   void _showDetailedCount() {
-    final input = _inputController.text;
-    final charCount = input.length;
-    final wordCount = _countWords();
-    final lineCount = _countLines();
-    final spaceCount = input.split(' ').length - 1;
-    final punctuationCount =
-        input.split(RegExp(r'[.,;!?()\[\]{}:"]')).length - 1;
+    final stats = TextUtil.getDetailedStats(_inputController.text);
 
     showDialog(
       context: context,
@@ -305,11 +279,11 @@ class _TextToolsState extends State<TextTools> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('总字符数：$charCount'),
-              Text('单词数：$wordCount'),
-              Text('行数：$lineCount'),
-              Text('空格数：$spaceCount'),
-              Text('标点符号数：$punctuationCount'),
+              Text('总字符数：${stats['characters']}'),
+              Text('单词数：${stats['words']}'),
+              Text('行数：${stats['lines']}'),
+              Text('空格数：${stats['spaces']}'),
+              Text('标点符号数：${stats['punctuation']}'),
             ],
           ),
           actions: [
@@ -323,39 +297,35 @@ class _TextToolsState extends State<TextTools> {
     );
   }
 
-  /// Encode to Base64
+  /// Base64编码
   void _encodeBase64() {
-    try {
-      final input = _inputController.text;
-      final bytes = utf8.encode(input);
-      final encoded = base64.encode(bytes);
-      setState(() {
-        _output = encoded;
-      });
-    } catch (e) {
+    final result = TextUtil.encodeBase64(_inputController.text);
+    if (result == null) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('编码失败，请检查输入')));
+    } else {
+      setState(() {
+        _output = result;
+      });
     }
   }
 
-  /// Decode from Base64
+  /// Base64解码
   void _decodeBase64() {
-    try {
-      final input = _inputController.text;
-      final bytes = base64.decode(input);
-      final decoded = utf8.decode(bytes);
-      setState(() {
-        _output = decoded;
-      });
-    } catch (e) {
+    final result = TextUtil.decodeBase64(_inputController.text);
+    if (result == null) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('解码失败，请检查输入')));
+    } else {
+      setState(() {
+        _output = result;
+      });
     }
   }
 
-  /// Copy result to clipboard
+  /// 复制结果到剪贴板
   void _copyResult() {
     if (_output.isEmpty) return;
 
@@ -365,7 +335,7 @@ class _TextToolsState extends State<TextTools> {
     ).showSnackBar(const SnackBar(content: Text('结果已复制到剪贴板')));
   }
 
-  /// Clear input field
+  /// 清空输入
   void _clearInput() {
     setState(() {
       _inputController.clear();
@@ -373,21 +343,7 @@ class _TextToolsState extends State<TextTools> {
     });
   }
 
-  /// Count words
-  int _countWords() {
-    final input = _inputController.text.trim();
-    if (input.isEmpty) return 0;
-    return input.split(RegExp(r'\s+')).length;
-  }
-
-  /// Count lines
-  int _countLines() {
-    final input = _inputController.text;
-    if (input.isEmpty) return 0;
-    return input.split('\n').length;
-  }
-
-  /// Show batch operation dialog
+  /// 显示批量操作对话框
   void _showBatchOperationDialog() {
     final List<String> operations = [
       '转大写',
@@ -397,7 +353,10 @@ class _TextToolsState extends State<TextTools> {
       '去除换行',
       '去除所有空白',
     ];
-    final List<bool> selectedOperations = List<bool>.filled(operations.length, false);
+    final List<bool> selectedOperations = List<bool>.filled(
+      operations.length,
+      false,
+    );
 
     showDialog(
       context: context,
@@ -440,45 +399,49 @@ class _TextToolsState extends State<TextTools> {
     );
   }
 
-  /// Execute batch operations
+  /// 执行批量操作
   void _executeBatchOperations(List<bool> selectedOperations) {
     if (_inputController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请先输入文本')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('请先输入文本')));
       return;
     }
 
     var result = _inputController.text;
 
     // 按顺序执行选中的操作
-    if (selectedOperations[0]) { // 转大写
-      result = result.toUpperCase();
+    if (selectedOperations[0]) {
+      // 转大写
+      result = TextUtil.convertCase(result, TextCaseType.uppercase);
     }
-    if (selectedOperations[1]) { // 转小写
-      result = result.toLowerCase();
+    if (selectedOperations[1]) {
+      // 转小写
+      result = TextUtil.convertCase(result, TextCaseType.lowercase);
     }
-    if (selectedOperations[2]) { // 首字母大写
-      if (result.isNotEmpty) {
-        result = result.substring(0, 1).toUpperCase() + result.substring(1).toLowerCase();
-      }
+    if (selectedOperations[2]) {
+      // 首字母大写
+      result = TextUtil.convertCase(result, TextCaseType.capitalize);
     }
-    if (selectedOperations[3]) { // 去除空格
-      result = result.replaceAll(' ', '');
+    if (selectedOperations[3]) {
+      // 去除空格
+      result = TextUtil.removeSpaces(result);
     }
-    if (selectedOperations[4]) { // 去除换行
-      result = result.replaceAll('\n', '').replaceAll('\r', '');
+    if (selectedOperations[4]) {
+      // 去除换行
+      result = TextUtil.removeNewlines(result);
     }
-    if (selectedOperations[5]) { // 去除所有空白
-      result = result.replaceAll(RegExp(r'\s+'), '');
+    if (selectedOperations[5]) {
+      // 去除所有空白
+      result = TextUtil.removeAllWhitespace(result);
     }
 
     setState(() {
       _output = result;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('批量操作已执行完成')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('批量操作已执行完成')));
   }
 }

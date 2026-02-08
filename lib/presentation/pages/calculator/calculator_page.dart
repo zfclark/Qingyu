@@ -1,25 +1,29 @@
-/// Calculator
-/// Basic arithmetic calculator
-/// Created: 2026-02-04
+/// Calculator Page
+/// Author: ZF_Clark
+/// Description: UI page for basic arithmetic calculator. Uses CalculatorUtil for calculation logic. Provides number input, operator selection, and result display.
+/// Last Modified: 2026/02/08
 library;
 
 import 'package:flutter/material.dart';
+import '../../../core/utils/calculator_util.dart';
 
-class Calculator extends StatefulWidget {
-  const Calculator({super.key});
+/// 计算器页面
+/// 提供基础四则运算功能的UI界面
+class CalculatorPage extends StatefulWidget {
+  const CalculatorPage({super.key});
 
   @override
-  State<Calculator> createState() => _CalculatorState();
+  State<CalculatorPage> createState() => _CalculatorPageState();
 }
 
-class _CalculatorState extends State<Calculator> {
+class _CalculatorPageState extends State<CalculatorPage> {
   String _display = '0';
   double _firstOperand = 0;
   double _secondOperand = 0;
   String _operator = '';
   bool _isNewOperation = true;
 
-  /// Button types
+  /// 按钮配置
   final List<List<Map<String, dynamic>>> _buttons = [
     [
       {'text': 'C', 'color': Colors.grey[300], 'textcolor': Colors.black},
@@ -63,7 +67,7 @@ class _CalculatorState extends State<Calculator> {
       appBar: AppBar(title: const Text('计算器')),
       body: Column(
         children: [
-          // Display
+          // 显示屏
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(16),
@@ -79,7 +83,7 @@ class _CalculatorState extends State<Calculator> {
             ),
           ),
 
-          // Buttons
+          // 按钮区域
           Container(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -117,7 +121,7 @@ class _CalculatorState extends State<Calculator> {
     );
   }
 
-  /// Handle button press
+  /// 处理按钮点击
   void _onButtonPressed(String buttonText) {
     setState(() {
       switch (buttonText) {
@@ -148,7 +152,7 @@ class _CalculatorState extends State<Calculator> {
     });
   }
 
-  /// Clear calculator
+  /// 清空计算器
   void _clear() {
     _display = '0';
     _firstOperand = 0;
@@ -157,84 +161,53 @@ class _CalculatorState extends State<Calculator> {
     _isNewOperation = true;
   }
 
-  /// Toggle sign
+  /// 切换正负号
   void _toggleSign() {
     if (_display == '0') return;
-    if (_display.startsWith('-')) {
-      _display = _display.substring(1);
-    } else {
-      _display = '-$_display';
-    }
+    final value = CalculatorUtil.parseNumber(_display);
+    final result = CalculatorUtil.toggleSign(value);
+    _display = CalculatorUtil.formatResult(result);
   }
 
-  /// Calculate percentage
+  /// 计算百分比
   void _calculatePercentage() {
-    double value = double.parse(_display);
-    value /= 100;
-    _display = value.toString();
+    final value = CalculatorUtil.parseNumber(_display);
+    final result = CalculatorUtil.calculatePercentage(value);
+    _display = CalculatorUtil.formatResult(result);
   }
 
-  /// Set operator
+  /// 设置运算符
   void _setOperator(String operator) {
-    _firstOperand = double.parse(_display);
+    _firstOperand = CalculatorUtil.parseNumber(_display);
     _operator = operator;
     _isNewOperation = true;
   }
 
-  /// Calculate result
+  /// 计算结果
   void _calculateResult() {
     if (_operator.isEmpty) return;
 
-    _secondOperand = double.parse(_display);
-    double result = 0;
+    _secondOperand = CalculatorUtil.parseNumber(_display);
+    final result = CalculatorUtil.calculate(_firstOperand, _secondOperand, _operator);
 
-    switch (_operator) {
-      case '÷':
-        if (_secondOperand == 0) {
-          _display = '错误';
-          return;
-        }
-        result = _firstOperand / _secondOperand;
-        break;
-      case '×':
-        result = _firstOperand * _secondOperand;
-        break;
-      case '-':
-        result = _firstOperand - _secondOperand;
-        break;
-      case '+':
-        result = _firstOperand + _secondOperand;
-        break;
-    }
-
-    // Format result
-    if (result == result.toInt()) {
-      _display = result.toInt().toString();
+    if (result == null) {
+      _display = '错误';
     } else {
-      _display = result.toString();
+      _display = CalculatorUtil.formatResult(result);
     }
 
     _operator = '';
     _isNewOperation = true;
   }
 
-  /// Add decimal
+  /// 添加小数点
   void _addDecimal() {
-    if (_display.contains('.')) return;
-    _display += '.';
+    _display = CalculatorUtil.addDecimal(_display);
   }
 
-  /// Add digit
+  /// 添加数字
   void _addDigit(String digit) {
-    if (_isNewOperation) {
-      _display = digit;
-      _isNewOperation = false;
-    } else {
-      if (_display == '0') {
-        _display = digit;
-      } else {
-        _display += digit;
-      }
-    }
+    _display = CalculatorUtil.appendDigit(_display, digit, _isNewOperation);
+    _isNewOperation = false;
   }
 }

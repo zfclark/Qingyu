@@ -1,22 +1,21 @@
 /// Home Page
 /// Author: ZF_Clark
-/// Description: Application homepage that displays tool categories, provides search functionality, shows favorite tools, and handles navigation to individual tool pages
-/// Last Modified: 2026/02/04
-/// Version: V0.1
+/// Description: Application homepage that displays tool categories, provides search functionality, shows favorite tools, and handles navigation to individual tool pages.
+/// Last Modified: 2026/02/08
 library;
 
 import 'package:flutter/material.dart';
-import '../hash_tools/hash_calculator.dart';
-import '../text_tools/text_tools.dart';
-import '../unit_converter/unit_converter.dart';
-import '../daily_tools/qr_code_generator.dart';
-import '../daily_tools/calculator.dart';
+import '../../../app/config/app_config.dart';
+import '../../../core/services/storage_service.dart';
 import '../settings/settings_page.dart';
-import 'tool_card.dart';
-import '../../data/services/storage_service.dart';
+import 'widgets/tool_card_widget.dart';
 
+/// 首页
+/// 应用的主页面，展示工具列表和分类
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final VoidCallback? onThemeChanged;
+
+  const HomePage({super.key, this.onThemeChanged});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -28,78 +27,9 @@ class _HomePageState extends State<HomePage> {
   List<String> _favoriteTools = [];
   int _currentIndex = 0;
 
-  /// Tool categories and items
-  final Map<String, List<Map<String, dynamic>>> _toolCategories = {
-    '常用工具': [
-      {
-        'id': 'hash_calculator',
-        'name': '哈希计算器',
-        'icon': Icons.calculate,
-        'description': '支持SHA1、SHA256、SHA512、MD5算法',
-        'widget': const HashCalculator(),
-      },
-      {
-        'id': 'text_tools',
-        'name': '文本工具',
-        'icon': Icons.text_fields,
-        'description': '文本处理工具集',
-        'widget': const TextTools(),
-      },
-      {
-        'id': 'unit_converter',
-        'name': '单位转换',
-        'icon': Icons.compare_arrows,
-        'description': '各种单位之间的转换',
-        'widget': const UnitConverter(),
-      },
-      {
-        'id': 'qr_code',
-        'name': '二维码生成',
-        'icon': Icons.qr_code,
-        'description': '将文本转换为二维码',
-        'widget': const QrCodeGenerator(),
-      },
-    ],
-    '加密工具': [
-      {
-        'id': 'hash_calculator',
-        'name': '哈希计算器',
-        'icon': Icons.calculate,
-        'description': '支持SHA1、SHA256、SHA512、MD5算法',
-        'widget': const HashCalculator(),
-      },
-      {
-        'id': 'md5',
-        'name': 'MD5 计算器',
-        'icon': Icons.lock,
-        'description': '计算文本的MD5哈希值',
-        'widget': const Placeholder(),
-      },
-      {
-        'id': 'base64',
-        'name': 'Base64 编解码',
-        'icon': Icons.code,
-        'description': 'Base64编码与解码',
-        'widget': const Placeholder(),
-      },
-    ],
-    '日常工具': [
-      {
-        'id': 'calculator',
-        'name': '计算器',
-        'icon': Icons.calculate_outlined,
-        'description': '基础四则运算',
-        'widget': const Calculator(),
-      },
-      {
-        'id': 'qr_code',
-        'name': '二维码生成',
-        'icon': Icons.qr_code,
-        'description': '将文本转换为二维码',
-        'widget': const QrCodeGenerator(),
-      },
-    ],
-  };
+  /// 工具分类和项目
+  final Map<String, List<Map<String, dynamic>>> _toolCategories =
+      AppConfig.toolCategories;
 
   @override
   void initState() {
@@ -107,14 +37,14 @@ class _HomePageState extends State<HomePage> {
     _loadFavorites();
   }
 
-  /// Load favorite tools from storage
+  /// 从存储加载收藏的工具
   void _loadFavorites() {
     setState(() {
       _favoriteTools = StorageService.getFavoriteTools();
     });
   }
 
-  /// Toggle favorite status
+  /// 切换收藏状态
   void _toggleFavorite(String toolId) {
     setState(() {
       if (_favoriteTools.contains(toolId)) {
@@ -126,7 +56,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  /// Filter tools by search query
+  /// 根据搜索关键词过滤工具
   List<Map<String, dynamic>> _filterTools(String category) {
     final tools = _toolCategories[category] ?? [];
     if (_searchQuery.isEmpty) return tools;
@@ -141,7 +71,7 @@ class _HomePageState extends State<HomePage> {
     }).toList();
   }
 
-  /// Get favorite tools
+  /// 获取收藏的工具
   List<Map<String, dynamic>> _getFavoriteTools() {
     final allTools = _toolCategories.values
         .expand((category) => category)
@@ -150,7 +80,7 @@ class _HomePageState extends State<HomePage> {
       return _favoriteTools.contains(tool['id']);
     }).toList();
 
-    // Remove duplicates
+    // 去重
     final uniqueFavorites = <Map<String, dynamic>>[];
     final seenIds = <String>{};
     for (final tool in favoriteTools) {
@@ -163,7 +93,7 @@ class _HomePageState extends State<HomePage> {
     return uniqueFavorites;
   }
 
-  /// Navigate to tool
+  /// 导航到工具页面
   void _navigateToTool(Widget toolWidget) {
     Navigator.push(
       context,
@@ -188,7 +118,6 @@ class _HomePageState extends State<HomePage> {
                 // Web端顶部导航项
                 TextButton(
                   onPressed: () {
-                    // 处理分类导航
                     setState(() {
                       _currentIndex = 1;
                     });
@@ -197,7 +126,6 @@ class _HomePageState extends State<HomePage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    // 处理我的导航
                     setState(() {
                       _currentIndex = 2;
                     });
@@ -207,11 +135,12 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(width: 8),
               ],
               IconButton(
-                onPressed: () {
-                  Navigator.push(
+                onPressed: () async {
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const SettingsPage(),
+                      builder: (context) =>
+                          SettingsPage(onThemeChanged: widget.onThemeChanged),
                     ),
                   );
                 },
@@ -223,7 +152,7 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // Search bar
+                // 搜索栏
                 TextField(
                   controller: _searchController,
                   onChanged: (value) {
@@ -252,7 +181,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 16),
 
-                // Favorite tools section
+                // 收藏工具区域
                 if (favoriteTools.isNotEmpty && _searchQuery.isEmpty)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -274,7 +203,7 @@ class _HomePageState extends State<HomePage> {
                             final tool = favoriteTools[index];
                             return SizedBox(
                               width: 140,
-                              child: ToolCard(
+                              child: ToolCardWidget(
                                 id: tool['id'],
                                 name: tool['name'],
                                 icon: tool['icon'],
@@ -292,7 +221,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
 
-                // Tool categories
+                // 工具分类
                 Column(
                   children: categories.map((category) {
                     final tools = _filterTools(category);
@@ -344,7 +273,7 @@ class _HomePageState extends State<HomePage> {
                               itemCount: tools.length,
                               itemBuilder: (context, toolIndex) {
                                 final tool = tools[toolIndex];
-                                return ToolCard(
+                                return ToolCardWidget(
                                   id: tool['id'],
                                   name: tool['name'],
                                   icon: tool['icon'],

@@ -1,29 +1,31 @@
-/// Unit Converter
+/// Unit Converter Page
 /// Author: ZF_Clark
-/// Description: Provides unit conversion utilities for length (millimeter, centimeter, meter, kilometer, inch, foot, yard, mile), weight (gram, kilogram, ton, milligram, pound, ounce), temperature (Celsius, Fahrenheit, Kelvin), and Unix timestamp conversion
-/// Last Modified: 2026/02/04
-/// Version: V0.1
+/// Description: UI page for unit conversion. Uses ConversionUtil for conversion logic. Supports length, weight, temperature, and timestamp conversion.
+/// Last Modified: 2026/02/08
 library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../core/utils/conversion_util.dart';
 
-class UnitConverter extends StatefulWidget {
-  const UnitConverter({super.key});
+/// 单位转换页面
+/// 提供各种单位转换功能的UI界面
+class UnitConverterPage extends StatefulWidget {
+  const UnitConverterPage({super.key});
 
   @override
-  State<UnitConverter> createState() => _UnitConverterState();
+  State<UnitConverterPage> createState() => _UnitConverterPageState();
 }
 
-class _UnitConverterState extends State<UnitConverter> {
+class _UnitConverterPageState extends State<UnitConverterPage> {
   final TextEditingController _inputController = TextEditingController();
   String _output = '';
   int _currentTab = 0;
 
-  /// Tab options
+  /// 标签页选项
   final List<String> _tabs = ['长度', '重量', '温度', '时间戳'];
 
-  /// Conversion units
+  /// 转换单位
   final Map<String, List<String>> _units = {
     '长度': ['毫米', '厘米', '米', '千米', '英寸', '英尺', '码', '英里'],
     '重量': ['克', '千克', '吨', '毫克', '磅', '盎司'],
@@ -42,7 +44,7 @@ class _UnitConverterState extends State<UnitConverter> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Tab bar
+            // 标签栏
             DefaultTabController(
               length: _tabs.length,
               initialIndex: _currentTab,
@@ -60,7 +62,7 @@ class _UnitConverterState extends State<UnitConverter> {
             ),
             const SizedBox(height: 16),
 
-            // Input section
+            // 输入区域
             Card(
               elevation: 0,
               shape: RoundedRectangleBorder(
@@ -86,7 +88,7 @@ class _UnitConverterState extends State<UnitConverter> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    if (_currentTab != 3) // Not timestamp
+                    if (_currentTab != 3) // 非时间戳
                       Row(
                         children: [
                           Expanded(
@@ -157,7 +159,7 @@ class _UnitConverterState extends State<UnitConverter> {
 
             const SizedBox(height: 16),
 
-            // Output section
+            // 输出区域
             if (_output.isNotEmpty)
               Card(
                 elevation: 0,
@@ -174,7 +176,9 @@ class _UnitConverterState extends State<UnitConverter> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: SelectableText(_output),
@@ -195,42 +199,42 @@ class _UnitConverterState extends State<UnitConverter> {
     );
   }
 
-  /// Reset units based on current tab
+  /// 根据当前标签重置单位
   void _resetUnits() {
     switch (_currentTab) {
-      case 0: // Length
+      case 0: // 长度
         _fromUnit = '米';
         _toUnit = '千米';
         break;
-      case 1: // Weight
+      case 1: // 重量
         _fromUnit = '千克';
         _toUnit = '克';
         break;
-      case 2: // Temperature
+      case 2: // 温度
         _fromUnit = '摄氏度';
         _toUnit = '华氏度';
         break;
-      case 3: // Timestamp
+      case 3: // 时间戳
         break;
     }
   }
 
-  /// Convert units
+  /// 执行转换
   void _convert() {
     if (_inputController.text.isEmpty) return;
 
     try {
       switch (_currentTab) {
-        case 0: // Length
+        case 0: // 长度
           _convertLength();
           break;
-        case 1: // Weight
+        case 1: // 重量
           _convertWeight();
           break;
-        case 2: // Temperature
+        case 2: // 温度
           _convertTemperature();
           break;
-        case 3: // Timestamp
+        case 3: // 时间戳
           _convertTimestamp();
           break;
       }
@@ -241,216 +245,54 @@ class _UnitConverterState extends State<UnitConverter> {
     }
   }
 
-  /// Convert length
+  /// 转换长度
   void _convertLength() {
     final value = double.parse(_inputController.text);
-    double result;
-
-    // Convert to meters first
-    double meters;
-    switch (_fromUnit) {
-      case '毫米':
-        meters = value / 1000;
-        break;
-      case '厘米':
-        meters = value / 100;
-        break;
-      case '米':
-        meters = value;
-        break;
-      case '千米':
-        meters = value * 1000;
-        break;
-      case '英寸':
-        meters = value * 0.0254;
-        break;
-      case '英尺':
-        meters = value * 0.3048;
-        break;
-      case '码':
-        meters = value * 0.9144;
-        break;
-      case '英里':
-        meters = value * 1609.34;
-        break;
-      default:
-        meters = value;
-    }
-
-    // Convert from meters to target unit
-    switch (_toUnit) {
-      case '毫米':
-        result = meters * 1000;
-        break;
-      case '厘米':
-        result = meters * 100;
-        break;
-      case '米':
-        result = meters;
-        break;
-      case '千米':
-        result = meters / 1000;
-        break;
-      case '英寸':
-        result = meters / 0.0254;
-        break;
-      case '英尺':
-        result = meters / 0.3048;
-        break;
-      case '码':
-        result = meters / 0.9144;
-        break;
-      case '英里':
-        result = meters / 1609.34;
-        break;
-      default:
-        result = meters;
-    }
-
+    final result = ConversionUtil.convertLengthByName(
+      value,
+      _fromUnit,
+      _toUnit,
+    );
     setState(() {
       _output = '$result $_toUnit';
     });
   }
 
-  /// Convert weight
+  /// 转换重量
   void _convertWeight() {
     final value = double.parse(_inputController.text);
-    double result;
-
-    // Convert to grams first
-    double grams;
-    switch (_fromUnit) {
-      case '克':
-        grams = value;
-        break;
-      case '千克':
-        grams = value * 1000;
-        break;
-      case '吨':
-        grams = value * 1000000;
-        break;
-      case '毫克':
-        grams = value / 1000;
-        break;
-      case '磅':
-        grams = value * 453.592;
-        break;
-      case '盎司':
-        grams = value * 28.3495;
-        break;
-      default:
-        grams = value;
-    }
-
-    // Convert from grams to target unit
-    switch (_toUnit) {
-      case '克':
-        result = grams;
-        break;
-      case '千克':
-        result = grams / 1000;
-        break;
-      case '吨':
-        result = grams / 1000000;
-        break;
-      case '毫克':
-        result = grams * 1000;
-        break;
-      case '磅':
-        result = grams / 453.592;
-        break;
-      case '盎司':
-        result = grams / 28.3495;
-        break;
-      default:
-        result = grams;
-    }
-
+    final result = ConversionUtil.convertWeightByName(
+      value,
+      _fromUnit,
+      _toUnit,
+    );
     setState(() {
       _output = '$result $_toUnit';
     });
   }
 
-  /// Convert temperature
+  /// 转换温度
   void _convertTemperature() {
     final value = double.parse(_inputController.text);
-    double result;
-
-    switch (_fromUnit) {
-      case '摄氏度':
-        if (_toUnit == '华氏度') {
-          result = (value * 9 / 5) + 32;
-        } else if (_toUnit == '开尔文') {
-          result = value + 273.15;
-        } else {
-          result = value;
-        }
-        break;
-      case '华氏度':
-        if (_toUnit == '摄氏度') {
-          result = (value - 32) * 5 / 9;
-        } else if (_toUnit == '开尔文') {
-          result = (value - 32) * 5 / 9 + 273.15;
-        } else {
-          result = value;
-        }
-        break;
-      case '开尔文':
-        if (_toUnit == '摄氏度') {
-          result = value - 273.15;
-        } else if (_toUnit == '华氏度') {
-          result = (value - 273.15) * 9 / 5 + 32;
-        } else {
-          result = value;
-        }
-        break;
-      default:
-        result = value;
-    }
-
+    final result = ConversionUtil.convertTemperatureByName(
+      value,
+      _fromUnit,
+      _toUnit,
+    );
     setState(() {
       _output = '$result $_toUnit';
     });
   }
 
-  /// Convert timestamp
+  /// 转换时间戳
   void _convertTimestamp() {
-    final input = _inputController.text.trim();
-    String result;
-
-    // Try to parse as timestamp
-    if (input.isNotEmpty && input.contains(RegExp(r'^\d+$'))) {
-      try {
-        final timestamp = int.parse(input);
-        final date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
-        result = date.toString();
-      } catch (e) {
-        // Try parsing as milliseconds
-        try {
-          final timestamp = int.parse(input);
-          final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-          result = date.toString();
-        } catch (e) {
-          result = '无效的时间戳';
-        }
-      }
-    } else {
-      // Try to parse as date
-      try {
-        final date = DateTime.parse(input);
-        result =
-            '${date.millisecondsSinceEpoch ~/ 1000} (秒)\n${date.millisecondsSinceEpoch} (毫秒)';
-      } catch (e) {
-        result = '无效的日期格式';
-      }
-    }
-
+    final result = ConversionUtil.convertTimestamp(_inputController.text);
     setState(() {
       _output = result;
     });
   }
 
-  /// Copy result to clipboard
+  /// 复制结果到剪贴板
   void _copyResult() {
     if (_output.isEmpty) return;
 
@@ -460,7 +302,7 @@ class _UnitConverterState extends State<UnitConverter> {
     ).showSnackBar(const SnackBar(content: Text('结果已复制到剪贴板')));
   }
 
-  /// Clear input field
+  /// 清空输入
   void _clearInput() {
     setState(() {
       _inputController.clear();
