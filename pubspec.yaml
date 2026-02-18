@@ -31,6 +31,9 @@ dev_dependencies:
 flutter:
     uses-material-design: true
 
+flutter_app_name:
+    name: "清隅"
+
 flutter_launcher_icons:
     android: "launcher_icon"
     # ios: true
