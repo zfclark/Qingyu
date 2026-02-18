@@ -96,6 +96,6 @@ class CalculatorUtil {
   /// 返回添加小数点后的字符串
   static String addDecimal(String current) {
     if (current.contains('.')) return current;
-    return current + '.';
+    return '$current.';
   }
 }

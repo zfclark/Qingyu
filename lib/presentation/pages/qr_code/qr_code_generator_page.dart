@@ -97,7 +97,7 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
               Expanded(
                 child: Card(
                   elevation: 4,
-                  shadowColor: Colors.black.withOpacity(0.1),
+                  shadowColor: Colors.black.withValues(alpha: 0.1),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -123,10 +123,10 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
+                                    color: Colors.black.withValues(alpha: 0.05),
                                     spreadRadius: 2,
                                     blurRadius: 10,
-                                    offset: Offset(0, 2),
+                                    offset: const Offset(0, 2),
                                   ),
                                 ],
                               ),
