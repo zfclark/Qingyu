@@ -1,7 +1,7 @@
 /// Main Application Entry
 /// Author: ZF_Clark
 /// Description: Initializes storage service and sets up the application with proper theming and routing.
-/// Last Modified: 2026/02/08
+/// Last Modified: 2026/02/19
 library;
 
 import 'package:flutter/material.dart';
@@ -30,17 +30,19 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   ThemeMode _themeMode = ThemeMode.system;
+  String _fontSize = 'medium';
 
   @override
   void initState() {
     super.initState();
-    _loadThemeMode();
+    _loadSettings();
   }
 
-  /// 加载主题模式
-  void _loadThemeMode() {
+  /// 加载设置
+  void _loadSettings() {
     setState(() {
       _themeMode = _getThemeModeFromStorage();
+      _fontSize = StorageService.getFontSize();
     });
   }
 
@@ -58,17 +60,24 @@ class _MainAppState extends State<MainApp> {
     }
   }
 
+  /// 获取字体大小配置
+  FontSizeConfig _getFontSizeConfig() {
+    return FontSizeConfig.fromString(_fontSize);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final fontSizeConfig = _getFontSizeConfig();
+
     return MaterialApp(
       title: AppConfig.appName,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme: AppTheme.getLightTheme(fontSizeConfig),
+      darkTheme: AppTheme.getDarkTheme(fontSizeConfig),
       themeMode: _themeMode,
       home: HomePage(
         onThemeChanged: () {
-          // 主题变更时重新加载
-          _loadThemeMode();
+          // 设置变更时重新加载
+          _loadSettings();
         },
       ),
       debugShowCheckedModeBanner: false,

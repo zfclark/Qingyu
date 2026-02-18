@@ -1,14 +1,14 @@
 /// Settings Page
 /// Author: ZF_Clark
 /// Description: App settings page.
-/// Last Modified: 2026/02/08
+/// Last Modified: 2026/02/19
 library;
 
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../../app/config/app_config.dart';
 import '../../../core/services/storage_service.dart';
+import '../../../core/utils/data_export_util.dart';
 
 class SettingsPage extends StatefulWidget {
   final VoidCallback? onThemeChanged;
@@ -470,56 +470,86 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   /// 导出数据
-  void _exportData(BuildContext context) {
+  Future<void> _exportData(BuildContext context) async {
     try {
       final data = StorageService.exportData();
-      final jsonString = jsonEncode(data);
+      final result = await DataExportUtil.exportToFile(data, 'qingyu_backup');
 
-      // Web端导出功能
-      if (kIsWeb) {
-        _exportDataWeb(context, jsonString);
+      if (result != null) {
+        if (kIsWeb) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('数据已开始下载')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('数据导出成功')),
+          );
+        }
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('数据导出功能即将推出')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('数据导出已取消或失败')),
+        );
       }
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('数据导出失败，请重试')));
+      ).showSnackBar(SnackBar(content: Text('数据导出失败: $e')));
     }
   }
 
-  /// Web端导出数据实现
-  void _exportDataWeb(BuildContext context, String jsonString) {
-    // 使用动态导入避免在非Web平台编译错误
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('数据导出功能在Web端可用')));
-  }
 
   /// 导入数据
-  void _importData(BuildContext context) {
+  Future<void> _importData(BuildContext context) async {
     try {
-      if (kIsWeb) {
-        _importDataWeb(context);
-      } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('数据导入功能即将推出')));
+      final data = await DataExportUtil.importFromFile();
+
+      if (data == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('数据导入已取消')),
+        );
+        return;
+      }
+
+      // 验证数据格式
+      if (!DataExportUtil.validateImportData(data)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('数据格式无效，请选择正确的备份文件')),
+        );
+        return;
+      }
+
+      // 确认导入
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('确认导入'),
+          content: const Text('导入数据将覆盖当前设置和历史记录，是否继续？'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('导入'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed == true) {
+        await StorageService.importData(data);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('数据导入成功')),
+        );
+        // 刷新页面
+        setState(() {});
       }
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('数据导入失败，请重试')));
+      ).showSnackBar(SnackBar(content: Text('数据导入失败: $e')));
     }
   }
 
-  /// Web端导入数据实现
-  void _importDataWeb(BuildContext context) {
-    // 使用动态导入避免在非Web平台编译错误
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('数据导入功能在Web端可用')));
-  }
 }

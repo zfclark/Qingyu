@@ -7,6 +7,7 @@ library;
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'platform_util.dart';
 
 /// 日志级别枚举
 enum LogLevel {
@@ -55,7 +56,7 @@ class LoggerUtil {
   /// 初始化日志系统
   Future<void> _initialize() async {
     try {
-      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      if (!kIsWeb && PlatformUtil.isMobilePlatform()) {
         // 在移动平台上初始化日志文件
         final directory = await _getLogDirectory();
         if (directory != null) {
@@ -185,7 +186,7 @@ class LoggerUtil {
         '$timestamp [${_levelToString(level)}] [$module] $message';
 
     // 在移动平台上，只输出到应用内部日志文件
-    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+    if (!kIsWeb && PlatformUtil.isMobilePlatform()) {
       await _writeToFile(logMessage);
     } else if (kDebugMode) {
       // 在调试模式下，输出到控制台

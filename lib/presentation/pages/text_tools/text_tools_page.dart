@@ -361,39 +361,92 @@ class _TextToolsPageState extends State<TextToolsPage> {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('批量操作'),
-          content: StatefulBuilder(
-            builder: (context, setState) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: List.generate(operations.length, (index) {
-                  return CheckboxListTile(
-                    title: Text(operations[index]),
-                    value: selectedOperations[index],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedOperations[index] = value ?? false;
-                      });
-                    },
-                  );
-                }),
-              );
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
-            ),
-            TextButton(
-              onPressed: () {
-                _executeBatchOperations(selectedOperations);
-                Navigator.pop(context);
-              },
-              child: const Text('执行'),
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('批量操作'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 大小写转换组
+                    const Text(
+                      '大小写转换（互斥）：',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    ...List.generate(3, (index) {
+                      return CheckboxListTile(
+                        title: Text(operations[index]),
+                        value: selectedOperations[index],
+                        onChanged: (value) {
+                          setDialogState(() {
+                            // 大小写操作互斥，选择一个时取消其他
+                            if (value == true) {
+                              selectedOperations[0] = false;
+                              selectedOperations[1] = false;
+                              selectedOperations[2] = false;
+                              selectedOperations[index] = true;
+                            } else {
+                              selectedOperations[index] = false;
+                            }
+                          });
+                        },
+                      );
+                    }),
+                    const Divider(),
+                    // 空格处理组
+                    const Text(
+                      '空格处理：',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    ...List.generate(3, (index) {
+                      final actualIndex = index + 3;
+                      return CheckboxListTile(
+                        title: Text(operations[actualIndex]),
+                        subtitle: index == 2 
+                            ? const Text('包含去除空格和去除换行', style: TextStyle(fontSize: 11))
+                            : null,
+                        value: selectedOperations[actualIndex],
+                        onChanged: (value) {
+                          setDialogState(() {
+                            // 选择"去除所有空白"时自动取消前两个
+                            if (actualIndex == 5 && value == true) {
+                              selectedOperations[3] = false;
+                              selectedOperations[4] = false;
+                            }
+                            // 选择前两个时取消"去除所有空白"
+                            if ((actualIndex == 3 || actualIndex == 4) && value == true) {
+                              selectedOperations[5] = false;
+                            }
+                            selectedOperations[actualIndex] = value ?? false;
+                          });
+                        },
+                      );
+                    }),
+                    const SizedBox(height: 8),
+                    const Text(
+                      '提示：操作按显示顺序依次执行',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('取消'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _executeBatchOperations(selectedOperations);
+                    Navigator.pop(context);
+                  },
+                  child: const Text('执行'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -409,39 +462,49 @@ class _TextToolsPageState extends State<TextToolsPage> {
     }
 
     var result = _inputController.text;
+    int executedCount = 0;
 
     // 按顺序执行选中的操作
+    // 大小写转换（互斥，只会执行其中一个）
     if (selectedOperations[0]) {
-      // 转大写
       result = TextUtil.convertCase(result, TextCaseType.uppercase);
-    }
-    if (selectedOperations[1]) {
-      // 转小写
+      executedCount++;
+    } else if (selectedOperations[1]) {
       result = TextUtil.convertCase(result, TextCaseType.lowercase);
-    }
-    if (selectedOperations[2]) {
-      // 首字母大写
+      executedCount++;
+    } else if (selectedOperations[2]) {
       result = TextUtil.convertCase(result, TextCaseType.capitalize);
+      executedCount++;
     }
-    if (selectedOperations[3]) {
-      // 去除空格
-      result = TextUtil.removeSpaces(result);
-    }
-    if (selectedOperations[4]) {
-      // 去除换行
-      result = TextUtil.removeNewlines(result);
-    }
+
+    // 空格处理
     if (selectedOperations[5]) {
-      // 去除所有空白
+      // 去除所有空白（优先级最高）
       result = TextUtil.removeAllWhitespace(result);
+      executedCount++;
+    } else {
+      if (selectedOperations[3]) {
+        result = TextUtil.removeSpaces(result);
+        executedCount++;
+      }
+      if (selectedOperations[4]) {
+        result = TextUtil.removeNewlines(result);
+        executedCount++;
+      }
     }
 
     setState(() {
       _output = result;
     });
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('批量操作已执行完成')));
+    if (executedCount == 0) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('请至少选择一个操作')));
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('已执行 $executedCount 项操作')));
+    }
   }
 }

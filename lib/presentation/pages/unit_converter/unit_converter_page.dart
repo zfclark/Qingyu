@@ -93,7 +93,7 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              initialValue: _fromUnit,
+                              value: _fromUnit,
                               items: _units[_tabs[_currentTab]]?.map((unit) {
                                 return DropdownMenuItem<String>(
                                   value: unit,
@@ -115,7 +115,7 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
                           const SizedBox(width: 16),
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              initialValue: _toUnit,
+                              value: _toUnit,
                               items: _units[_tabs[_currentTab]]?.map((unit) {
                                 return DropdownMenuItem<String>(
                                   value: unit,

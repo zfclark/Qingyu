@@ -1,7 +1,7 @@
 /// Home Page
 /// Author: ZF_Clark
 /// Description: Application homepage with collapsible sidebar navigation supporting two main sections: Categories and Online. Features responsive layout for desktop, tablet, and mobile.
-/// Last Modified: 2026/02/09
+/// Last Modified: 2026/02/19
 library;
 
 import 'package:flutter/material.dart';
@@ -44,6 +44,7 @@ class _HomePageState extends State<HomePage> {
     '常用工具': Icons.star,
     '加密工具': Icons.security,
     '日常工具': Icons.calendar_today,
+    '网络工具': Icons.network_check,
   };
 
   /// 分类颜色映射
@@ -51,12 +52,33 @@ class _HomePageState extends State<HomePage> {
     '常用工具': Colors.amber,
     '加密工具': Colors.green,
     '日常工具': Colors.blue,
+    '网络工具': Colors.purple,
   };
+
+  /// 工具ID到工具信息的映射缓存
+  late final Map<String, Map<String, dynamic>> _toolByIdCache;
+
+  /// 收藏的工具列表缓存
+  List<Map<String, dynamic>> _favoriteToolsCache = [];
 
   @override
   void initState() {
     super.initState();
+    _buildToolCache();
     _loadInitialState();
+  }
+
+  /// 构建工具ID缓存
+  void _buildToolCache() {
+    _toolByIdCache = {};
+    for (final category in _toolCategories.values) {
+      for (final tool in category) {
+        final id = tool['id'] as String?;
+        if (id != null) {
+          _toolByIdCache[id] = tool;
+        }
+      }
+    }
   }
 
   /// 加载初始状态
@@ -64,7 +86,16 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _favoriteTools = StorageService.getFavoriteTools();
       _categoryExpandedStates = StorageService.getCategoryExpandedStates();
+      _updateFavoriteToolsCache();
     });
+  }
+
+  /// 更新收藏工具缓存
+  void _updateFavoriteToolsCache() {
+    _favoriteToolsCache = _favoriteTools
+        .where((id) => _toolByIdCache.containsKey(id))
+        .map((id) => _toolByIdCache[id]!)
+        .toList();
   }
 
   /// 切换收藏状态
@@ -76,6 +107,7 @@ class _HomePageState extends State<HomePage> {
         _favoriteTools.add(toolId);
       }
       StorageService.saveFavoriteTools(_favoriteTools);
+      _updateFavoriteToolsCache();
     });
   }
 
@@ -87,24 +119,7 @@ class _HomePageState extends State<HomePage> {
 
   /// 获取收藏的工具
   List<Map<String, dynamic>> _getFavoriteTools() {
-    final allTools = _toolCategories.values
-        .expand((category) => category)
-        .toList();
-    final favoriteTools = allTools.where((tool) {
-      return _favoriteTools.contains(tool['id']);
-    }).toList();
-
-    // 去重
-    final uniqueFavorites = <Map<String, dynamic>>[];
-    final seenIds = <String>{};
-    for (final tool in favoriteTools) {
-      if (!seenIds.contains(tool['id'])) {
-        seenIds.add(tool['id']!);
-        uniqueFavorites.add(tool);
-      }
-    }
-
-    return uniqueFavorites;
+    return _favoriteToolsCache;
   }
 
   /// 导航到工具页面

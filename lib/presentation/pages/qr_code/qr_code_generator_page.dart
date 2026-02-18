@@ -15,6 +15,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qingyu/core/utils/qr_code_saver.dart';
+import '../../../core/utils/platform_util.dart';
 
 /// 二维码生成页面
 /// 提供将文本转换为二维码的UI界面
@@ -282,7 +283,27 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
           .then((byteData) => byteData!.buffer.asUint8List());
 
       // 检测平台并执行相应的保存逻辑
-      if (Platform.isAndroid) {
+      if (kIsWeb) {
+        // Web平台：使用download API
+        try {
+          final fileName =
+              'qr_code_${DateTime.now().millisecondsSinceEpoch}.png';
+          final success = await QrCodeSaverWeb.saveQrCode(imageBytes, fileName);
+          if (success) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('二维码已开始下载')));
+          } else {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Web平台保存失败')));
+          }
+        } catch (e) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Web平台保存失败: $e')));
+        }
+      } else if (PlatformUtil.isAndroid()) {
         // Android平台：保存到公共图片目录
         Directory? directory;
         try {
@@ -309,7 +330,7 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('二维码已保存到: ${file.path}')));
-      } else if (Platform.isIOS) {
+      } else if (PlatformUtil.isIOS()) {
         // iOS平台：保存到应用文档目录
         Directory directory = await getApplicationDocumentsDirectory();
         String path = directory.path;
@@ -324,26 +345,6 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('二维码已保存到: ${file.path}')));
-      } else if (kIsWeb) {
-        // Web平台：使用download API
-        try {
-          final fileName =
-              'qr_code_${DateTime.now().millisecondsSinceEpoch}.png';
-          final success = await QrCodeSaverWeb.saveQrCode(imageBytes, fileName);
-          if (success) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('二维码已开始下载')));
-          } else {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('Web平台保存失败')));
-          }
-        } catch (e) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Web平台保存失败: $e')));
-        }
       } else {
         // 其他平台：保存到应用文档目录
         Directory directory = await getApplicationDocumentsDirectory();
