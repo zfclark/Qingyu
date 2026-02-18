@@ -1,7 +1,7 @@
 /// App configuration constants
 /// Author: ZF_Clark
 /// Description: Provides global configuration values for the application.
-/// Last Modified: 2026/02/09
+/// Last Modified: 2026/02/19
 library;
 
 import 'package:flutter/material.dart';
@@ -18,7 +18,7 @@ class AppConfig {
   static const String appName = '清隅';
 
   /// App version
-  static const String appVersion = '0.1.0';
+  static const String appVersion = '1.0.0';
 
   /// Copyright information
   static const String copyright = '© 2026 ZF-Clark';
