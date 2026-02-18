@@ -6,7 +6,6 @@ library;
 
 import 'dart:async';
 import 'dart:io';
-import 'dart:js_interop';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -15,7 +14,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:web/web.dart' as web;
+import 'package:qingyu/core/utils/qr_code_saver.dart';
 
 /// 二维码生成页面
 /// 提供将文本转换为二维码的UI界面
@@ -328,31 +327,19 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
       } else if (kIsWeb) {
         // Web平台：使用download API
         try {
-          // 创建Blob对象
-          final blob = web.Blob(
-            [imageBytes] as JSArray<web.BlobPart>,
-            'image/png' as web.BlobPropertyBag,
-          );
-          // 创建下载URL
-          final url = web.URL.createObjectURL(blob);
-          // 创建下载链接
-          final anchor =
-              web.document.createElement('a') as web.HTMLAnchorElement;
-          anchor.href = url;
-          anchor.download =
+          final fileName =
               'qr_code_${DateTime.now().millisecondsSinceEpoch}.png';
-          web.document.body?.appendChild(anchor);
-          anchor.click();
-          web.document.body?.removeChild(anchor);
-          // 释放URL
-          web.URL.revokeObjectURL(url);
-
-          // 显示保存成功消息
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('二维码已开始下载')));
+          final success = await QrCodeSaverWeb.saveQrCode(imageBytes, fileName);
+          if (success) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('二维码已开始下载')));
+          } else {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Web平台保存失败')));
+          }
         } catch (e) {
-          // 显示保存失败消息
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text('Web平台保存失败: $e')));

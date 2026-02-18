@@ -170,195 +170,15 @@ class _PingTestPageState extends State<PingTestPage> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Ping测试')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 输入区域
-            Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('目标地址：'),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _targetController,
-                      decoration: InputDecoration(
-                        hintText: '输入域名或IP地址',
-                        prefixIcon: const Icon(Icons.network_ping),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        suffixIcon: _targetController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear),
-                                onPressed: () {
-                                  _targetController.clear();
-                                  setState(() {});
-                                },
-                              )
-                            : null,
-                      ),
-                      onChanged: (_) => setState(() {}),
-                    ),
-                    const SizedBox(height: 12),
-                    // 常用目标
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _commonTargets.map((target) {
-                        return ActionChip(
-                          label: Text(target),
-                          onPressed: () {
-                            _targetController.text = target;
-                            setState(() {});
-                          },
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 16),
-                    // 测试次数选择
-                    Row(
-                      children: [
-                        const Text('测试次数：'),
-                        const SizedBox(width: 12),
-                        SegmentedButton<int>(
-                          segments: const [
-                            ButtonSegment(value: 4, label: Text('4次')),
-                            ButtonSegment(value: 10, label: Text('10次')),
-                            ButtonSegment(value: 20, label: Text('20次')),
-                          ],
-                          selected: {_testCount},
-                          onSelectionChanged: (selected) {
-                            setState(() {
-                              _testCount = selected.first;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-
-                    // 数据包大小选择
-                    Row(
-                      children: [
-                        const Text('数据包大小：'),
-                        const SizedBox(width: 12),
-                        SegmentedButton<int>(
-                          segments: const [
-                            ButtonSegment(value: 64, label: Text('64B')),
-                            ButtonSegment(value: 128, label: Text('128B')),
-                            ButtonSegment(value: 256, label: Text('256B')),
-                          ],
-                          selected: {_packetSize},
-                          onSelectionChanged: (selected) {
-                            setState(() {
-                              _packetSize = selected.first;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-
-                    // 超时时间选择
-                    Row(
-                      children: [
-                        const Text('超时时间：'),
-                        const SizedBox(width: 12),
-                        SegmentedButton<int>(
-                          segments: const [
-                            ButtonSegment(value: 3, label: Text('3s')),
-                            ButtonSegment(value: 5, label: Text('5s')),
-                            ButtonSegment(value: 10, label: Text('10s')),
-                          ],
-                          selected: {_timeout},
-                          onSelectionChanged: (selected) {
-                            setState(() {
-                              _timeout = selected.first;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-
-                    // 重试次数选择
-                    Row(
-                      children: [
-                        const Text('重试次数：'),
-                        const SizedBox(width: 12),
-                        SegmentedButton<int>(
-                          segments: const [
-                            ButtonSegment(value: 0, label: Text('0次')),
-                            ButtonSegment(value: 2, label: Text('2次')),
-                            ButtonSegment(value: 3, label: Text('3次')),
-                          ],
-                          selected: {_retries},
-                          onSelectionChanged: (selected) {
-                            setState(() {
-                              _retries = selected.first;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    // 操作按钮
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: _isTesting ? null : _startPingTest,
-                            icon: _isTesting
-                                ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.play_arrow),
-                            label: Text(
-                              _isTesting
-                                  ? '测试中 ($_currentTest/$_testCount)'
-                                  : '开始测试',
-                            ),
-                          ),
-                        ),
-                        if (_results.isNotEmpty) ...[
-                          const SizedBox(width: 12),
-                          ElevatedButton.icon(
-                            onPressed: _clearResults,
-                            icon: const Icon(Icons.clear_all),
-                            label: const Text('清空'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: colorScheme.errorContainer,
-                              foregroundColor: colorScheme.onErrorContainer,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // 统计信息
-            if (stats.isNotEmpty) ...[
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 输入区域
               Card(
                 elevation: 0,
-                color: colorScheme.primaryContainer,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -367,140 +187,323 @@ class _PingTestPageState extends State<PingTestPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '测试结果统计',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onPrimaryContainer,
+                      const Text('目标地址：'),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _targetController,
+                        decoration: InputDecoration(
+                          hintText: '输入域名或IP地址',
+                          prefixIcon: const Icon(Icons.network_ping),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          suffixIcon: _targetController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    _targetController.clear();
+                                    setState(() {});
+                                  },
+                                )
+                              : null,
                         ),
+                        onChanged: (_) => setState(() {}),
                       ),
                       const SizedBox(height: 12),
+                      // 常用目标
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _commonTargets.map((target) {
+                          return ActionChip(
+                            label: Text(target),
+                            onPressed: () {
+                              _targetController.text = target;
+                              setState(() {});
+                            },
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+                      // 测试次数选择
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _buildStatItem(
-                            '发送',
-                            '${stats['total']}',
-                            Icons.send,
-                            colorScheme,
-                          ),
-                          _buildStatItem(
-                            '成功',
-                            '${stats['success']}',
-                            Icons.check_circle,
-                            colorScheme,
-                            color: Colors.green,
-                          ),
-                          _buildStatItem(
-                            '丢包率',
-                            '${stats['lossRate']}%',
-                            Icons.error,
-                            colorScheme,
-                            color: stats['failed'] > 0
-                                ? Colors.red
-                                : Colors.green,
+                          const Text('测试次数：'),
+                          const SizedBox(width: 12),
+                          SegmentedButton<int>(
+                            segments: const [
+                              ButtonSegment(value: 4, label: Text('4次')),
+                              ButtonSegment(value: 10, label: Text('10次')),
+                              ButtonSegment(value: 20, label: Text('20次')),
+                            ],
+                            selected: {_testCount},
+                            onSelectionChanged: (selected) {
+                              setState(() {
+                                _testCount = selected.first;
+                              });
+                            },
                           ),
                         ],
                       ),
-                      if (stats['avgLatency'] != null) ...[
-                        const SizedBox(height: 12),
-                        const Divider(),
+                      const SizedBox(height: 12),
+
+                      // 数据包大小选择
+                      Row(
+                        children: [
+                          const Text('数据包大小：'),
+                          const SizedBox(width: 12),
+                          SegmentedButton<int>(
+                            segments: const [
+                              ButtonSegment(value: 64, label: Text('64B')),
+                              ButtonSegment(value: 128, label: Text('128B')),
+                              ButtonSegment(value: 256, label: Text('256B')),
+                            ],
+                            selected: {_packetSize},
+                            onSelectionChanged: (selected) {
+                              setState(() {
+                                _packetSize = selected.first;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      // 超时时间选择
+                      Row(
+                        children: [
+                          const Text('超时时间：'),
+                          const SizedBox(width: 12),
+                          SegmentedButton<int>(
+                            segments: const [
+                              ButtonSegment(value: 3, label: Text('3s')),
+                              ButtonSegment(value: 5, label: Text('5s')),
+                              ButtonSegment(value: 10, label: Text('10s')),
+                            ],
+                            selected: {_timeout},
+                            onSelectionChanged: (selected) {
+                              setState(() {
+                                _timeout = selected.first;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      // 重试次数选择
+                      Row(
+                        children: [
+                          const Text('重试次数：'),
+                          const SizedBox(width: 12),
+                          SegmentedButton<int>(
+                            segments: const [
+                              ButtonSegment(value: 0, label: Text('0次')),
+                              ButtonSegment(value: 2, label: Text('2次')),
+                              ButtonSegment(value: 3, label: Text('3次')),
+                            ],
+                            selected: {_retries},
+                            onSelectionChanged: (selected) {
+                              setState(() {
+                                _retries = selected.first;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // 操作按钮
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: _isTesting ? null : _startPingTest,
+                              icon: _isTesting
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.play_arrow),
+                              label: Text(
+                                _isTesting
+                                    ? '测试中 ($_currentTest/$_testCount)'
+                                    : '开始测试',
+                              ),
+                            ),
+                          ),
+                          if (_results.isNotEmpty) ...[
+                            const SizedBox(width: 12),
+                            ElevatedButton.icon(
+                              onPressed: _clearResults,
+                              icon: const Icon(Icons.clear_all),
+                              label: const Text('清空'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: colorScheme.errorContainer,
+                                foregroundColor: colorScheme.onErrorContainer,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // 统计信息
+              if (stats.isNotEmpty) ...[
+                Card(
+                  elevation: 0,
+                  color: colorScheme.primaryContainer,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '测试结果统计',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onPrimaryContainer,
+                          ),
+                        ),
                         const SizedBox(height: 12),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _buildStatItem(
-                              '最小延迟',
-                              '${stats['minLatency']}ms',
-                              Icons.speed,
+                              '发送',
+                              '${stats['total']}',
+                              Icons.send,
                               colorScheme,
                             ),
                             _buildStatItem(
-                              '平均延迟',
-                              '${stats['avgLatency']}ms',
-                              Icons.trending_flat,
+                              '成功',
+                              '${stats['success']}',
+                              Icons.check_circle,
                               colorScheme,
+                              color: Colors.green,
                             ),
                             _buildStatItem(
-                              '最大延迟',
-                              '${stats['maxLatency']}ms',
-                              Icons.speed,
+                              '丢包率',
+                              '${stats['lossRate']}%',
+                              Icons.error,
                               colorScheme,
+                              color: stats['failed'] > 0
+                                  ? Colors.red
+                                  : Colors.green,
                             ),
                           ],
                         ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            // 详细结果列表
-            if (_results.isNotEmpty) ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    '详细结果：',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text('${_results.length} 条记录'),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(8),
-                    itemCount: _results.length,
-                    itemBuilder: (context, index) {
-                      final result = _results[index];
-                      return ListTile(
-                        leading: Icon(
-                          result.success ? Icons.check_circle : Icons.error,
-                          color: result.success ? Colors.green : Colors.red,
-                        ),
-                        title: Text('测试 #${index + 1}'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              result.success
-                                  ? '延迟: ${result.latency}ms'
-                                  : '失败: ${result.error}',
-                            ),
-                            if (!result.success && result.errorType != null)
-                              Text(
-                                '错误类型: ${_getErrorTypeString(result.errorType!)}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
-                                ),
+                        if (stats['avgLatency'] != null) ...[
+                          const SizedBox(height: 12),
+                          const Divider(),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _buildStatItem(
+                                '最小延迟',
+                                '${stats['minLatency']}ms',
+                                Icons.speed,
+                                colorScheme,
                               ),
-                          ],
-                        ),
-                        trailing: Text(
-                          '${result.timestamp.hour.toString().padLeft(2, '0')}:${result.timestamp.minute.toString().padLeft(2, '0')}:${result.timestamp.second.toString().padLeft(2, '0')}',
-                          style: const TextStyle(
-                            fontFamily: 'Monospace',
-                            fontSize: 12,
+                              _buildStatItem(
+                                '平均延迟',
+                                '${stats['avgLatency']}ms',
+                                Icons.trending_flat,
+                                colorScheme,
+                              ),
+                              _buildStatItem(
+                                '最大延迟',
+                                '${stats['maxLatency']}ms',
+                                Icons.speed,
+                                colorScheme,
+                              ),
+                            ],
                           ),
-                        ),
-                      );
-                    },
+                        ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 16),
+              ],
+
+              // 详细结果列表
+              if (_results.isNotEmpty) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '详细结果：',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text('${_results.length} 条记录'),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 300,
+                  child: Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(8),
+                      itemCount: _results.length,
+                      itemBuilder: (context, index) {
+                        final result = _results[index];
+                        return ListTile(
+                          leading: Icon(
+                            result.success ? Icons.check_circle : Icons.error,
+                            color: result.success ? Colors.green : Colors.red,
+                          ),
+                          title: Text('测试 #${index + 1}'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                result.success
+                                    ? '延迟: ${result.latency}ms'
+                                    : '失败: ${result.error}',
+                              ),
+                              if (!result.success && result.errorType != null)
+                                Text(
+                                  '错误类型: ${_getErrorTypeString(result.errorType!)}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                            ],
+                          ),
+                          trailing: Text(
+                            '${result.timestamp.hour.toString().padLeft(2, '0')}:${result.timestamp.minute.toString().padLeft(2, '0')}:${result.timestamp.second.toString().padLeft(2, '0')}',
+                            style: const TextStyle(
+                              fontFamily: 'Monospace',
+                              fontSize: 12,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
