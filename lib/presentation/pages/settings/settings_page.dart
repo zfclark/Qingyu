@@ -44,10 +44,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       color: Theme.of(context).colorScheme.primaryContainer,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Icon(
-                      Icons.build,
-                      size: 40,
-                      color: Theme.of(context).colorScheme.primary,
+                    child: Image.asset(
+                      'web/icons/icon.png',
+                      width: 40,
+                      height: 40,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -143,22 +143,19 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             StorageService.saveThemeMode('light');
+                            widget.onThemeChanged?.call();
                             // 延迟显示 SnackBar，确保主题已更新
-                            Future.delayed(
+                            await Future.delayed(
                               const Duration(milliseconds: 100),
-                              () {
-                                widget.onThemeChanged?.call();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text('主题已设置为浅色模式'),
-                                    backgroundColor: Theme.of(
-                                      context,
-                                    ).primaryColor,
-                                  ),
-                                );
-                              },
+                            );
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('主题已设置为浅色模式'),
+                                backgroundColor: Theme.of(context).primaryColor,
+                              ),
                             );
                           },
                           child: const Text('浅色'),
@@ -167,22 +164,19 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             StorageService.saveThemeMode('dark');
+                            widget.onThemeChanged?.call();
                             // 延迟显示 SnackBar，确保主题已更新
-                            Future.delayed(
+                            await Future.delayed(
                               const Duration(milliseconds: 100),
-                              () {
-                                widget.onThemeChanged?.call();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text('主题已设置为深色模式'),
-                                    backgroundColor: Theme.of(
-                                      context,
-                                    ).primaryColor,
-                                  ),
-                                );
-                              },
+                            );
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('主题已设置为深色模式'),
+                                backgroundColor: Theme.of(context).primaryColor,
+                              ),
                             );
                           },
                           child: const Text('深色'),
@@ -191,22 +185,19 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             StorageService.saveThemeMode('system');
+                            widget.onThemeChanged?.call();
                             // 延迟显示 SnackBar，确保主题已更新
-                            Future.delayed(
+                            await Future.delayed(
                               const Duration(milliseconds: 100),
-                              () {
-                                widget.onThemeChanged?.call();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text('主题已设置为跟随系统'),
-                                    backgroundColor: Theme.of(
-                                      context,
-                                    ).primaryColor,
-                                  ),
-                                );
-                              },
+                            );
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('主题已设置为跟随系统'),
+                                backgroundColor: Theme.of(context).primaryColor,
+                              ),
                             );
                           },
                           child: const Text('系统'),
@@ -277,7 +268,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: const Text('导出数据'),
                   subtitle: const Text('将数据导出为JSON文件'),
                   onTap: () {
-                    _exportData(context);
+                    _exportData();
                   },
                 ),
                 const Divider(height: 1),
@@ -286,7 +277,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: const Text('导入数据'),
                   subtitle: const Text('从JSON文件导入数据'),
                   onTap: () {
-                    _importData(context);
+                    _importData();
                   },
                 ),
               ],
@@ -470,67 +461,71 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   /// 导出数据
-  Future<void> _exportData(BuildContext context) async {
+  Future<void> _exportData() async {
     try {
       final data = StorageService.exportData();
       final result = await DataExportUtil.exportToFile(data, 'qingyu_backup');
 
+      if (!mounted) return;
       if (result != null) {
         if (kIsWeb) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('数据已开始下载')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('数据已开始下载')));
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('数据导出成功')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('数据导出成功')));
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('数据导出已取消或失败')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('数据导出已取消或失败')));
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('数据导出失败: $e')));
     }
   }
 
-
   /// 导入数据
-  Future<void> _importData(BuildContext context) async {
+  Future<void> _importData() async {
     try {
       final data = await DataExportUtil.importFromFile();
 
       if (data == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('数据导入已取消')),
-        );
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('数据导入已取消')));
         return;
       }
 
       // 验证数据格式
       if (!DataExportUtil.validateImportData(data)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('数据格式无效，请选择正确的备份文件')),
-        );
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('数据格式无效，请选择正确的备份文件')));
         return;
       }
 
       // 确认导入
+      if (!mounted) return;
       final confirmed = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (dialogContext) => AlertDialog(
           title: const Text('确认导入'),
           content: const Text('导入数据将覆盖当前设置和历史记录，是否继续？'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
+              onPressed: () => Navigator.of(dialogContext).pop(false),
               child: const Text('取消'),
             ),
             TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
               child: const Text('导入'),
             ),
           ],
@@ -539,17 +534,17 @@ class _SettingsPageState extends State<SettingsPage> {
 
       if (confirmed == true) {
         await StorageService.importData(data);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('数据导入成功')),
-        );
-        // 刷新页面
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('数据导入成功')));
         setState(() {});
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('数据导入失败: $e')));
     }
   }
-
 }

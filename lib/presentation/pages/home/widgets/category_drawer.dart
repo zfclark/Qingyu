@@ -31,6 +31,9 @@ class CategoryDrawer extends StatefulWidget {
   /// 工具点击回调
   final Function(Map<String, dynamic> tool) onToolTap;
 
+  /// 工具数量（可选，用于显示数量徽章）
+  final int? toolCount;
+
   /// 构造函数
   const CategoryDrawer({
     super.key,
@@ -41,6 +44,7 @@ class CategoryDrawer extends StatefulWidget {
     required this.onExpansionChanged,
     required this.tools,
     required this.onToolTap,
+    this.toolCount,
   });
 
   @override
@@ -97,6 +101,7 @@ class _CategoryDrawerState extends State<CategoryDrawer>
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final categoryColor = _getCategoryColor(context);
+    final toolCount = widget.toolCount ?? widget.tools.length;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
@@ -178,6 +183,23 @@ class _CategoryDrawerState extends State<CategoryDrawer>
                             ),
                       ),
                     ),
+                    // 工具数量徽章
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: categoryColor.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '$toolCount',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: categoryColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     // 展开/收起箭头
                     RotationTransition(
                       turns: _rotationAnimation,

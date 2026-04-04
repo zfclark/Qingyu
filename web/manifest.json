@@ -1,11 +1,11 @@
 {
-    "name": "qingyu",
-    "short_name": "qingyu",
+    "name": "清隅",
+    "short_name": "清隅",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#hexcode",
     "theme_color": "#hexcode",
-    "description": "A new Flutter project.",
+    "description": "清隅工具箱 - 高效实用的工具集合",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

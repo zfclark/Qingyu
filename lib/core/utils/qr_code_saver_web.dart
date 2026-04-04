@@ -20,8 +20,8 @@ class QrCodeSaverWeb {
   static Future<bool> saveQrCode(Uint8List imageBytes, String fileName) async {
     try {
       final blob = web.Blob(
-        [imageBytes] as JSArray<web.BlobPart>,
-        'image/png' as web.BlobPropertyBag,
+        [imageBytes.toJS].toJS as JSArray<web.BlobPart>,
+        web.BlobPropertyBag(type: 'image/png'),
       );
       final url = web.URL.createObjectURL(blob);
       final anchor = web.document.createElement('a') as web.HTMLAnchorElement;

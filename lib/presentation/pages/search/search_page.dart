@@ -348,7 +348,9 @@ class _SearchPageState extends State<SearchPage> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: localItems.map((item) => _buildItemChip(item)).toList(),
+            children: List.generate(localItems.length, (index) {
+              return _buildItemChip(localItems[index]);
+            }),
           ),
           const SizedBox(height: 24),
         ],
@@ -365,7 +367,9 @@ class _SearchPageState extends State<SearchPage> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: onlineItems.map((item) => _buildItemChip(item)).toList(),
+            children: List.generate(onlineItems.length, (index) {
+              return _buildItemChip(onlineItems[index]);
+            }),
           ),
           const SizedBox(height: 24),
         ],

@@ -1,7 +1,7 @@
 /// Main Application Entry
 /// Author: ZF_Clark
 /// Description: Initializes storage service and sets up the application with proper theming and routing.
-/// Last Modified: 2026/02/19
+/// Last Modified: 2026/04/04
 library;
 
 import 'package:flutter/material.dart';
@@ -31,19 +31,26 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   ThemeMode _themeMode = ThemeMode.system;
   String _fontSize = 'medium';
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _loadSettings();
+    _loadSettingsAsync();
   }
 
-  /// 加载设置
-  void _loadSettings() {
-    setState(() {
-      _themeMode = _getThemeModeFromStorage();
-      _fontSize = StorageService.getFontSize();
-    });
+  /// 异步加载设置
+  Future<void> _loadSettingsAsync() async {
+    final themeMode = _getThemeModeFromStorage();
+    final fontSize = StorageService.getFontSize();
+
+    if (mounted) {
+      setState(() {
+        _themeMode = themeMode;
+        _fontSize = fontSize;
+        _isInitialized = true;
+      });
+    }
   }
 
   /// 从存储获取主题模式
@@ -74,13 +81,19 @@ class _MainAppState extends State<MainApp> {
       theme: AppTheme.getLightTheme(fontSizeConfig),
       darkTheme: AppTheme.getDarkTheme(fontSizeConfig),
       themeMode: _themeMode,
-      home: HomePage(
-        onThemeChanged: () {
-          // 设置变更时重新加载
-          _loadSettings();
-        },
-      ),
+      home: _isInitialized
+          ? HomePage(
+              onThemeChanged: () {
+                _loadSettingsAsync();
+              },
+            )
+          : _buildLoadingScreen(),
       debugShowCheckedModeBanner: false,
     );
+  }
+
+  /// 构建加载屏幕
+  Widget _buildLoadingScreen() {
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 }

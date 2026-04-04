@@ -284,85 +284,67 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
 
       // 检测平台并执行相应的保存逻辑
       if (kIsWeb) {
-        // Web平台：使用download API
-        try {
-          final fileName =
-              'qr_code_${DateTime.now().millisecondsSinceEpoch}.png';
-          final success = await QrCodeSaverWeb.saveQrCode(imageBytes, fileName);
-          if (success) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('二维码已开始下载')));
-          } else {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('Web平台保存失败')));
-          }
-        } catch (e) {
+        final fileName =
+            'qr_code_${DateTime.now().millisecondsSinceEpoch}.png';
+        final success = await QrCodeSaverWeb.saveQrCode(imageBytes, fileName);
+        if (!mounted) return;
+        if (success) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('Web平台保存失败: $e')));
+          ).showSnackBar(const SnackBar(content: Text('二维码已开始下载')));
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Web平台保存失败')));
         }
       } else if (PlatformUtil.isAndroid()) {
-        // Android平台：保存到公共图片目录
         Directory? directory;
         try {
-          // 尝试获取公共图片目录
           directory = Directory('/storage/emulated/0/Pictures/Qingyu');
-          // 如果目录不存在，创建它
           if (!directory.existsSync()) {
             directory.createSync(recursive: true);
           }
         } catch (e) {
-          // 如果无法访问公共目录，回退到应用文档目录
           directory = await getApplicationDocumentsDirectory();
         }
 
         String path = directory.path;
-        // 创建保存文件
         File file = File(
           '$path/qr_code_${DateTime.now().millisecondsSinceEpoch}.png',
         );
-        // 写入文件
         await file.writeAsBytes(imageBytes);
 
-        // 显示保存成功消息
+        if (!mounted) return;
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('二维码已保存到: ${file.path}')));
       } else if (PlatformUtil.isIOS()) {
-        // iOS平台：保存到应用文档目录
         Directory directory = await getApplicationDocumentsDirectory();
         String path = directory.path;
-        // 创建保存文件
         File file = File(
           '$path/qr_code_${DateTime.now().millisecondsSinceEpoch}.png',
         );
-        // 写入文件
         await file.writeAsBytes(imageBytes);
 
-        // 显示保存成功消息
+        if (!mounted) return;
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('二维码已保存到: ${file.path}')));
       } else {
-        // 其他平台：保存到应用文档目录
         Directory directory = await getApplicationDocumentsDirectory();
         String path = directory.path;
-        // 创建保存文件
         File file = File(
           '$path/qr_code_${DateTime.now().millisecondsSinceEpoch}.png',
         );
-        // 写入文件
         await file.writeAsBytes(imageBytes);
 
-        // 显示保存成功消息
+        if (!mounted) return;
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('二维码已保存到: ${file.path}')));
       }
     } catch (e) {
-      // 显示保存失败消息
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('保存失败: $e')));

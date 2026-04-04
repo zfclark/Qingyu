@@ -1,13 +1,14 @@
 /// Storage Service
 /// Author: ZF_Clark
-/// Description: Uses shared_preferences for lightweight local storage, providing methods for saving and retrieving hash calculation history, favorite tools, and theme mode settings. Includes cache management functionality.
-/// Last Modified: 2026/02/09
+/// Description: Uses shared_preferences for lightweight local storage, providing methods for saving and retrieving hash calculation history, favorite tools, theme mode settings, and time screen settings. Includes cache management functionality.
+/// Last Modified: 2026/03/01
 library;
 
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/models/hash_history_model.dart';
+import '../../data/models/time_screen_settings_model.dart';
 import '../../app/config/app_config.dart';
 
 /// 存储服务类
@@ -372,6 +373,44 @@ class StorageService {
         print('Error getting selected category index: $e');
       }
       return 0;
+    }
+  }
+
+  // ==================== 时间屏幕设置存储 ====================
+
+  /// 缓存键：时间屏幕设置
+  static const String _timeScreenSettingsKey = 'time_screen_settings';
+
+  /// 保存时间屏幕设置
+  ///
+  /// [settings] 时间屏幕设置模型
+  static Future<void> saveTimeScreenSettings(TimeScreenSettings settings) async {
+    try {
+      final jsonString = jsonEncode(settings.toJson());
+      await _prefs.setString(_timeScreenSettingsKey, jsonString);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error saving time screen settings: $e');
+      }
+    }
+  }
+
+  /// 获取时间屏幕设置
+  ///
+  /// 返回时间屏幕设置模型
+  static TimeScreenSettings getTimeScreenSettings() {
+    try {
+      final jsonString = _prefs.getString(_timeScreenSettingsKey);
+      if (jsonString == null) {
+        return const TimeScreenSettings();
+      }
+      final Map<String, dynamic> decoded = jsonDecode(jsonString);
+      return TimeScreenSettings.fromJson(decoded);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting time screen settings: $e');
+      }
+      return const TimeScreenSettings();
     }
   }
 }
