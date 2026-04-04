@@ -94,6 +94,10 @@ class _MainAppState extends State<MainApp> {
 
   /// 构建加载屏幕
   Widget _buildLoadingScreen() {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
   }
 }

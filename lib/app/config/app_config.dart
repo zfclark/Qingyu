@@ -32,7 +32,7 @@ class AppConfig {
   static const String appName = '清隅';
 
   /// App version
-  static const String appVersion = '1.0.0';
+  static const String appVersion = '1.1.0';
 
   /// Copyright information
   static const String copyright = '© 2026 ZF-Clark';
@@ -52,8 +52,12 @@ class AppConfig {
   /// Maximum history records to store
   static const int maxHistoryRecords = 50;
 
-  /// Tool categories and items
-  static Map<String, List<Map<String, dynamic>>> get toolCategories {
+  /// Tool categories and items - 使用静态常量避免重复创建
+  static final Map<String, List<Map<String, dynamic>>> toolCategories =
+      _buildToolCategories();
+
+  /// 构建工具分类
+  static Map<String, List<Map<String, dynamic>>> _buildToolCategories() {
     final categories = <String, List<Map<String, dynamic>>>{
       // ===== 生活便捷 =====
       '生活便捷': [
@@ -62,7 +66,7 @@ class AppConfig {
           'name': '文本工具',
           'icon': Icons.text_fields,
           'description': '文本处理工具集',
-          'widget': TextToolsPage(),
+          'widget': TextToolsPage,
           'color': null,
         },
         {
@@ -70,7 +74,7 @@ class AppConfig {
           'name': '字数统计',
           'icon': Icons.abc,
           'description': '统计字符与阅读时间',
-          'widget': WordCountPage(),
+          'widget': WordCountPage,
           'color': null,
         },
         {
@@ -78,7 +82,7 @@ class AppConfig {
           'name': '文本对比',
           'icon': Icons.difference,
           'description': '对比两个文本差异',
-          'widget': DiffToolsPage(),
+          'widget': DiffToolsPage,
           'color': null,
         },
         {
@@ -86,15 +90,15 @@ class AppConfig {
           'name': '时间计算',
           'icon': Icons.schedule,
           'description': '日期计算与年龄测算',
-          'widget': TimeCalculatorPage(),
+          'widget': TimeCalculatorPage,
           'color': null,
         },
         {
           'id': 'timestamp_tools',
           'name': '时间戳转换',
           'icon': Icons.timer,
-          'description': 'Unix时间戳互转',
-          'widget': TimestampToolsPage(),
+          'description': 'Unix 时间戳互转',
+          'widget': TimestampToolsPage,
           'color': null,
         },
         {
@@ -102,7 +106,7 @@ class AppConfig {
           'name': '随机生成',
           'icon': Icons.casino,
           'description': '随机数与随机选择',
-          'widget': RandomToolsPage(),
+          'widget': RandomToolsPage,
           'color': null,
         },
       ],
@@ -111,18 +115,18 @@ class AppConfig {
       '数据处理': [
         {
           'id': 'json_tools',
-          'name': 'JSON工具',
+          'name': 'JSON 工具',
           'icon': Icons.data_object,
-          'description': 'JSON格式化与验证',
-          'widget': JsonToolsPage(),
+          'description': 'JSON 格式化与验证',
+          'widget': JsonToolsPage,
           'color': null,
         },
         {
           'id': 'encoding_tools',
           'name': '编码解码',
           'icon': Icons.translate,
-          'description': 'Base64/URL/HTML编码',
-          'widget': EncodingToolsPage(),
+          'description': 'Base64/URL/HTML 编码',
+          'widget': EncodingToolsPage,
           'color': null,
         },
         {
@@ -130,15 +134,15 @@ class AppConfig {
           'name': '进制转换',
           'icon': Icons.swap_horiz,
           'description': '二进制/十进制/十六进制',
-          'widget': NumberBaseToolsPage(),
+          'widget': NumberBaseToolsPage,
           'color': null,
         },
         {
           'id': 'hash_calculator',
           'name': '哈希计算',
           'icon': Icons.tag,
-          'description': 'SHA/MD5哈希算法',
-          'widget': HashCalculatorPage(),
+          'description': 'SHA/MD5 哈希算法',
+          'widget': HashCalculatorPage,
           'color': null,
         },
         {
@@ -146,7 +150,7 @@ class AppConfig {
           'name': '文件大小',
           'icon': Icons.sd_storage,
           'description': '字节与容量单位转换',
-          'widget': FileSizeToolsPage(),
+          'widget': FileSizeToolsPage,
           'color': null,
         },
       ],
@@ -158,7 +162,7 @@ class AppConfig {
           'name': '正则匹配',
           'icon': Icons.code,
           'description': '正则表达式匹配',
-          'widget': RegexToolsPage(),
+          'widget': RegexToolsPage,
           'color': null,
         },
         {
@@ -166,15 +170,15 @@ class AppConfig {
           'name': '计算器',
           'icon': Icons.calculate,
           'description': '基础与科学计算',
-          'widget': CalculatorPage(),
+          'widget': CalculatorPage,
           'color': null,
         },
         {
           'id': 'uuid_tools',
-          'name': 'UUID生成',
+          'name': 'UUID 生成',
           'icon': Icons.fingerprint,
           'description': '生成唯一标识符',
-          'widget': UuidToolsPage(),
+          'widget': UuidToolsPage,
           'color': null,
         },
         {
@@ -182,15 +186,15 @@ class AppConfig {
           'name': '密码生成',
           'icon': Icons.password,
           'description': '随机密码与强度检测',
-          'widget': PasswordToolsPage(),
+          'widget': PasswordToolsPage,
           'color': null,
         },
         {
           'id': 'color_tools',
           'name': '颜色转换',
           'icon': Icons.palette,
-          'description': 'HEX/RGB/HSL互转',
-          'widget': ColorToolsPage(),
+          'description': 'HEX/RGB/HSL 互转',
+          'widget': ColorToolsPage,
           'color': null,
         },
       ],
@@ -202,7 +206,7 @@ class AppConfig {
           'name': '二维码',
           'icon': Icons.qr_code,
           'description': '生成二维码图片',
-          'widget': QrCodeGeneratorPage(),
+          'widget': QrCodeGeneratorPage,
           'color': null,
         },
         {
@@ -210,7 +214,7 @@ class AppConfig {
           'name': '时钟屏',
           'icon': Icons.access_time,
           'description': '全屏时间显示',
-          'widget': TimeScreenPage(),
+          'widget': TimeScreenPage,
           'color': null,
         },
         {
@@ -218,20 +222,20 @@ class AppConfig {
           'name': '单位转换',
           'icon': Icons.compare_arrows,
           'description': '长度/重量/温度转换',
-          'widget': UnitConverterPage(),
+          'widget': UnitConverterPage,
           'color': null,
         },
       ],
     };
 
-    // 仅在移动平台上添加Ping测试工具
+    // 仅在移动平台上添加 Ping 测试工具
     if (PlatformService.supportsNativeFeatures) {
       (categories['实用工具'] ?? []).add({
         'id': 'ping_test',
-        'name': 'Ping测试',
+        'name': 'Ping 测试',
         'icon': Icons.network_ping,
         'description': '网络连通性测试',
-        'widget': PingTestPage(),
+        'widget': PingTestPage,
         'color': null,
       });
     }
@@ -247,43 +251,34 @@ class AppConfig {
         'name': '天气查询',
         'icon': Icons.wb_sunny,
         'description': '实时天气信息',
-        'widget': null,
-        'color': null,
+        'widgetBuilder': null,
+        'url': 'https://weather.com/',
       },
       {
-        'id': 'news',
-        'name': '新闻资讯',
-        'icon': Icons.article,
-        'description': '最新新闻头条',
-        'widget': null,
-        'color': null,
+        'id': 'translate',
+        'name': '在线翻译',
+        'icon': Icons.translate,
+        'description': '多语言翻译服务',
+        'widgetBuilder': null,
+        'url': 'https://translate.google.com/',
       },
       {
-        'id': 'ip_lookup',
-        'name': 'IP查询',
-        'icon': Icons.location_on,
-        'description': '查询IP地址信息',
-        'widget': null,
-        'color': null,
-      },
-    ],
-    '开发辅助': [
-      {
-        'id': 'api_tester',
-        'name': 'API测试',
-        'icon': Icons.api,
-        'description': 'HTTP接口测试工具',
-        'widget': null,
-        'color': null,
-      },
-      {
-        'id': 'qr_scanner',
-        'name': '二维码扫描',
-        'icon': Icons.qr_code_scanner,
-        'description': '扫描识别二维码',
-        'widget': null,
-        'color': null,
+        'id': 'map',
+        'name': '地图导航',
+        'icon': Icons.map,
+        'description': '在线地图服务',
+        'widgetBuilder': null,
+        'url': 'https://maps.google.com/',
       },
     ],
   };
+
+  /// Get all tools as a flat list
+  static List<Map<String, dynamic>> getAllTools() {
+    final tools = <Map<String, dynamic>>[];
+    for (final category in toolCategories.values) {
+      tools.addAll(category);
+    }
+    return tools;
+  }
 }

@@ -10,6 +10,26 @@ import '../../../core/services/storage_service.dart';
 import '../settings/settings_page.dart';
 import '../online/online_page.dart';
 import '../search/search_page.dart';
+import '../text_tools/text_tools_page.dart';
+import '../word_count/word_count_page.dart';
+import '../diff_tools/diff_tools_page.dart';
+import '../time_calculator/time_calculator_page.dart';
+import '../timestamp_tools/timestamp_tools_page.dart';
+import '../random_tools/random_tools_page.dart';
+import '../json_tools/json_tools_page.dart';
+import '../encoding_tools/encoding_tools_page.dart';
+import '../number_base_tools/number_base_tools_page.dart';
+import '../hash/hash_calculator_page.dart';
+import '../file_size_tools/file_size_tools_page.dart';
+import '../regex_tools/regex_tools_page.dart';
+import '../calculator/calculator_page.dart';
+import '../uuid_tools/uuid_tools_page.dart';
+import '../password_tools/password_tools_page.dart';
+import '../color_tools/color_tools_page.dart';
+import '../qr_code/qr_code_generator_page.dart';
+import '../time_screen/time_screen_page.dart';
+import '../unit_converter/unit_converter_page.dart';
+import '../ping/ping_test_page.dart';
 import 'widgets/collapsible_sidebar.dart';
 import 'widgets/category_drawer.dart';
 import 'widgets/tool_card_widget.dart';
@@ -41,22 +61,21 @@ class _HomePageState extends State<HomePage> {
 
   /// 分类图标映射
   final Map<String, IconData> _categoryIcons = {
-    '常用工具': Icons.star,
-    '加密工具': Icons.security,
-    '日常工具': Icons.calendar_today,
+    '生活便捷': Icons.home,
+    '数据处理': Icons.storage,
+    '开发工具': Icons.code,
+    '实用工具': Icons.build,
     '网络工具': Icons.network_check,
   };
 
   /// 分类颜色映射
   final Map<String, Color> _categoryColors = {
-    '常用工具': Colors.amber,
-    '加密工具': Colors.green,
-    '日常工具': Colors.blue,
-    '网络工具': Colors.purple,
+    '生活便捷': const Color(0xFF4CAF50), // 绿色
+    '数据处理': const Color(0xFF2196F3), // 蓝色
+    '开发工具': const Color(0xFF9C27B0), // 紫色
+    '实用工具': const Color(0xFFFF9800), // 橙色
+    '网络工具': const Color(0xFF00BCD4), // 青色
   };
-
-  /// 工具ID到工具信息的映射缓存
-  late final Map<String, Map<String, dynamic>> _toolByIdCache;
 
   /// 收藏的工具列表缓存
   List<Map<String, dynamic>> _favoriteToolsCache = [];
@@ -64,21 +83,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _buildToolCache();
     _loadInitialState();
-  }
-
-  /// 构建工具ID缓存
-  void _buildToolCache() {
-    _toolByIdCache = {};
-    for (final category in _toolCategories.values) {
-      for (final tool in category) {
-        final id = tool['id'] as String?;
-        if (id != null) {
-          _toolByIdCache[id] = tool;
-        }
-      }
-    }
   }
 
   /// 加载初始状态
@@ -93,9 +98,21 @@ class _HomePageState extends State<HomePage> {
   /// 更新收藏工具缓存
   void _updateFavoriteToolsCache() {
     _favoriteToolsCache = _favoriteTools
-        .where((id) => _toolByIdCache.containsKey(id))
-        .map((id) => _toolByIdCache[id]!)
+        .where((id) => _getToolById(id) != null)
+        .map((id) => _getToolById(id)!)
         .toList();
+  }
+
+  /// 根据ID获取工具
+  Map<String, dynamic>? _getToolById(String id) {
+    for (final category in _toolCategories.values) {
+      for (final tool in category) {
+        if (tool['id'] == id) {
+          return tool;
+        }
+      }
+    }
+    return null;
   }
 
   /// 切换收藏状态
@@ -123,10 +140,34 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// 导航到工具页面
-  void _navigateToTool(Widget toolWidget) {
+  void _navigateToTool(Type widgetType) {
+    Widget createWidget() {
+      if (widgetType == TextToolsPage) return TextToolsPage();
+      if (widgetType == WordCountPage) return WordCountPage();
+      if (widgetType == DiffToolsPage) return DiffToolsPage();
+      if (widgetType == TimeCalculatorPage) return TimeCalculatorPage();
+      if (widgetType == TimestampToolsPage) return TimestampToolsPage();
+      if (widgetType == RandomToolsPage) return RandomToolsPage();
+      if (widgetType == JsonToolsPage) return JsonToolsPage();
+      if (widgetType == EncodingToolsPage) return EncodingToolsPage();
+      if (widgetType == NumberBaseToolsPage) return NumberBaseToolsPage();
+      if (widgetType == HashCalculatorPage) return HashCalculatorPage();
+      if (widgetType == FileSizeToolsPage) return FileSizeToolsPage();
+      if (widgetType == RegexToolsPage) return RegexToolsPage();
+      if (widgetType == CalculatorPage) return CalculatorPage();
+      if (widgetType == UuidToolsPage) return UuidToolsPage();
+      if (widgetType == PasswordToolsPage) return PasswordToolsPage();
+      if (widgetType == ColorToolsPage) return ColorToolsPage();
+      if (widgetType == QrCodeGeneratorPage) return QrCodeGeneratorPage();
+      if (widgetType == TimeScreenPage) return TimeScreenPage();
+      if (widgetType == UnitConverterPage) return UnitConverterPage();
+      if (widgetType == PingTestPage) return PingTestPage();
+      throw Exception('Unknown widget type: $widgetType');
+    }
+
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => toolWidget),
+      MaterialPageRoute(builder: (context) => createWidget()),
     );
   }
 
@@ -263,80 +304,31 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      drawer: Drawer(
-        child: Column(
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.apps, size: 32),
-                  SizedBox(width: 12),
-                  Text(
-                    '清隅工具箱',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.category,
-                color: _currentNavItem == NavItemType.categories
-                    ? Theme.of(context).colorScheme.primary
-                    : null,
-              ),
-              title: Text(
-                '分类',
-                style: TextStyle(
-                  color: _currentNavItem == NavItemType.categories
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-                  fontWeight: _currentNavItem == NavItemType.categories
-                      ? FontWeight.bold
-                      : null,
-                ),
-              ),
-              selected: _currentNavItem == NavItemType.categories,
-              onTap: () {
-                _onNavItemChanged(NavItemType.categories);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.cloud,
-                color: _currentNavItem == NavItemType.online
-                    ? Theme.of(context).colorScheme.primary
-                    : null,
-              ),
-              title: Text(
-                '在线',
-                style: TextStyle(
-                  color: _currentNavItem == NavItemType.online
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-                  fontWeight: _currentNavItem == NavItemType.online
-                      ? FontWeight.bold
-                      : null,
-                ),
-              ),
-              selected: _currentNavItem == NavItemType.online,
-              onTap: () {
-                _onNavItemChanged(NavItemType.online);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
         child: _currentNavItem == NavItemType.categories
             ? _buildCategoriesContent()
             : const OnlinePage(),
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentNavItem == NavItemType.categories ? 0 : 1,
+        onDestinationSelected: (index) {
+          _onNavItemChanged(
+            index == 0 ? NavItemType.categories : NavItemType.online,
+          );
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.apps_outlined),
+            selectedIcon: Icon(Icons.apps),
+            label: '工具',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.cloud_outlined),
+            selectedIcon: Icon(Icons.cloud),
+            label: '在线',
+          ),
+        ],
       ),
     );
   }
@@ -398,7 +390,7 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 收藏工具区域
+          // 收藏工具区域（优先展示）
           if (favoriteTools.isNotEmpty) ...[
             _buildSectionTitle('常用工具', Icons.favorite, Colors.red),
             const SizedBox(height: 12),
@@ -406,9 +398,14 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 24),
           ],
           // 分类抽屉列表
-          _buildSectionTitle('工具分类', Icons.category, Colors.blue),
+          _buildSectionTitle(
+            '所有工具',
+            Icons.apps,
+            Theme.of(context).colorScheme.primary,
+          ),
           const SizedBox(height: 12),
-          ...categories.map((category) {
+          ...List.generate(categories.length, (index) {
+            final category = categories[index];
             final tools = _filterTools(category);
             if (tools.isEmpty) return const SizedBox.shrink();
 
@@ -424,6 +421,7 @@ class _HomePageState extends State<HomePage> {
               onToolTap: (tool) => _navigateToTool(tool['widget']),
             );
           }),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -461,19 +459,17 @@ class _HomePageState extends State<HomePage> {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: favoriteTools.length,
+        itemExtent: 140,
         itemBuilder: (context, index) {
           final tool = favoriteTools[index];
-          return SizedBox(
-            width: 140,
-            child: ToolCardWidget(
-              id: tool['id'],
-              name: tool['name'],
-              icon: tool['icon'],
-              description: tool['description'],
-              isFavorite: true,
-              onTap: () => _navigateToTool(tool['widget']),
-              onFavoriteToggle: (isFavorite) => _toggleFavorite(tool['id']),
-            ),
+          return ToolCardWidget(
+            id: tool['id'],
+            name: tool['name'],
+            icon: tool['icon'],
+            description: tool['description'],
+            isFavorite: true,
+            onTap: () => _navigateToTool(tool['widget']),
+            onFavoriteToggle: (isFavorite) => _toggleFavorite(tool['id']),
           );
         },
       ),
