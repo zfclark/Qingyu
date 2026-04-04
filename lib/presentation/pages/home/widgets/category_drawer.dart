@@ -1,7 +1,7 @@
 /// Category Drawer
 /// Author: ZF_Clark
-/// Description: Collapsible category drawer with smooth expand/collapse animation. Displays tool chips when expanded.
-/// Last Modified: 2026/02/09
+/// Description: Collapsible category drawer with smooth expand/collapse animation. Optimized for performance.
+/// Last Modified: 2026/04/04
 library;
 
 import 'package:flutter/material.dart';
@@ -9,7 +9,7 @@ import 'tool_chip_widget.dart';
 
 /// 分类抽屉组件
 /// 可展开/收起的分类容器，内部显示工具列表
-class CategoryDrawer extends StatefulWidget {
+class CategoryDrawer extends StatelessWidget {
   /// 分类标题
   final String title;
 
@@ -48,72 +48,20 @@ class CategoryDrawer extends StatefulWidget {
   });
 
   @override
-  State<CategoryDrawer> createState() => _CategoryDrawerState();
-}
-
-class _CategoryDrawerState extends State<CategoryDrawer>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _rotationAnimation;
-  bool _isHovered = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 250),
-      vsync: this,
-    );
-    _rotationAnimation = Tween<double>(begin: 0, end: 0.5).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
-    );
-
-    if (widget.isExpanded) {
-      _controller.value = 1.0;
-    }
-  }
-
-  @override
-  void didUpdateWidget(CategoryDrawer oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.isExpanded != oldWidget.isExpanded) {
-      if (widget.isExpanded) {
-        _controller.forward();
-      } else {
-        _controller.reverse();
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  /// 获取分类颜色
-  Color _getCategoryColor(BuildContext context) {
-    if (widget.color != null) return widget.color!;
-    return Theme.of(context).colorScheme.primary;
-  }
-
-  @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final categoryColor = _getCategoryColor(context);
-    final toolCount = widget.toolCount ?? widget.tools.length;
+    final categoryColor = color ?? colorScheme.primary;
+    final toolCount = this.toolCount ?? tools.length;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeInOutCubic,
+    return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: widget.isExpanded
+        color: isExpanded
             ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: widget.isExpanded
+          color: isExpanded
               ? categoryColor.withValues(alpha: 0.2)
               : colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
@@ -123,135 +71,104 @@ class _CategoryDrawerState extends State<CategoryDrawer>
         mainAxisSize: MainAxisSize.min,
         children: [
           // 抽屉头部
-          MouseRegion(
-            onEnter: (_) => setState(() => _isHovered = true),
-            onExit: (_) => setState(() => _isHovered = false),
-            child: GestureDetector(
-              onTap: () => widget.onExpansionChanged(!widget.isExpanded),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                decoration: BoxDecoration(
-                  color: _isHovered
-                      ? colorScheme.primaryContainer.withValues(alpha: 0.3)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    // 左侧指示条
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 4,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: widget.isExpanded
-                            ? categoryColor
-                            : categoryColor.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(2),
+          InkWell(
+            onTap: () => onExpansionChanged(!isExpanded),
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
+              child: Row(
+                children: [
+                  // 左侧指示条
+                  Container(
+                    width: 4,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: isExpanded
+                          ? categoryColor
+                          : categoryColor.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // 分类图标
+                  Icon(
+                    icon,
+                    size: 22,
+                    color: isExpanded
+                        ? categoryColor
+                        : colorScheme.onSurface,
+                  ),
+                  const SizedBox(width: 12),
+                  // 分类标题
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: isExpanded
+                                ? categoryColor
+                                : colorScheme.onSurface,
+                            fontWeight: isExpanded
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                          ),
+                    ),
+                  ),
+                  // 工具数量徽章
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: categoryColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '$toolCount',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: categoryColor,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    // 分类图标
-                    AnimatedScale(
-                      scale: _isHovered ? 1.1 : 1.0,
-                      duration: const Duration(milliseconds: 150),
-                      child: Icon(
-                        widget.icon,
-                        size: 22,
-                        color: widget.isExpanded
-                            ? categoryColor
-                            : colorScheme.onSurface,
-                      ),
+                  ),
+                  const SizedBox(width: 8),
+                  // 展开/收起箭头
+                  AnimatedRotation(
+                    turns: isExpanded ? 0.5 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 24,
+                      color: isExpanded
+                          ? categoryColor
+                          : colorScheme.onSurfaceVariant,
                     ),
-                    const SizedBox(width: 12),
-                    // 分类标题
-                    Expanded(
-                      child: Text(
-                        widget.title,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: widget.isExpanded
-                                  ? categoryColor
-                                  : colorScheme.onSurface,
-                              fontWeight: widget.isExpanded
-                                  ? FontWeight.w600
-                                  : FontWeight.normal,
-                            ),
-                      ),
-                    ),
-                    // 工具数量徽章
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: categoryColor.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        '$toolCount',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: categoryColor,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // 展开/收起箭头
-                    RotationTransition(
-                      turns: _rotationAnimation,
-                      child: Icon(
-                        Icons.keyboard_arrow_down,
-                        size: 24,
-                        color: widget.isExpanded
-                            ? categoryColor
-                            : colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
           // 抽屉内容
-          ClipRect(
-            child: AnimatedAlign(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeInOutCubic,
-              alignment: Alignment.topCenter,
-              heightFactor: widget.isExpanded ? 1.0 : 0.0,
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 200),
-                opacity: widget.isExpanded ? 1.0 : 0.0,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: _buildToolsGrid(),
-                ),
+          if (isExpanded)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: tools.map((tool) {
+                  return ToolChipWidget(
+                    id: tool['id'] as String,
+                    name: tool['name'] as String,
+                    icon: tool['icon'] as IconData,
+                    statusDotColor: tool['color'] as Color?,
+                    onTap: () => onToolTap(tool),
+                  );
+                }).toList(),
               ),
             ),
-          ),
         ],
       ),
-    );
-  }
-
-  /// 构建工具网格
-  Widget _buildToolsGrid() {
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: widget.tools.map((tool) {
-        return ToolChipWidget(
-          id: tool['id'] as String,
-          name: tool['name'] as String,
-          icon: tool['icon'] as IconData,
-          statusDotColor: tool['color'] as Color?,
-          onTap: () => widget.onToolTap(tool),
-        );
-      }).toList(),
     );
   }
 }
