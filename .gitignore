@@ -98,6 +98,9 @@ obj/
 *.iws
 /out/
 
+# VSCode
+.vscode/
+
 # User-specific configurations
 .idea/libraries/
 .idea/.name
