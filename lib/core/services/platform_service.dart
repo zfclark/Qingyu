@@ -1,8 +1,10 @@
 /// Platform Service
 /// Author: ZF_Clark
 /// Description: Provides platform-specific services and features. Handles Web and Android platform differences.
-/// Last Modified: 2026/04/04
+/// Last Modified: 2026/05/15
 library;
+
+import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 
@@ -51,17 +53,18 @@ class PlatformService {
 
   /// 检测平台
   static String _detectPlatform() {
-    // Flutter Web平台检测
     if (kIsWeb) return 'web';
-    
-    // 平台特定逻辑
+
     try {
-      // 尝试使用Platform检测
-      // 由于这是简化实现，使用静态检测
-      return 'android'; // 默认Android
+      if (Platform.isAndroid) return 'android';
+      if (Platform.isIOS) return 'ios';
+      if (Platform.isWindows) return 'windows';
+      if (Platform.isMacOS) return 'macos';
+      if (Platform.isLinux) return 'linux';
     } catch (e) {
-      return 'unknown';
+      // Web平台不支持Platform类，已通过kIsWeb检测
     }
+    return 'unknown';
   }
 
   /// 检测是否为移动平台
