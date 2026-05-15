@@ -99,7 +99,7 @@ obj/
 /out/
 
 # VSCode
-.vscode/
+.vscode
 
 # User-specific configurations
 .idea/libraries/
