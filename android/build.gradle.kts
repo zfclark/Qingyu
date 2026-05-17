@@ -4,6 +4,7 @@ allprojects {
 		maven(url = "https://maven.aliyun.com/repository/central") 
 		maven(url = "https://maven.aliyun.com/repository/google") 
 		maven(url = "https://maven.aliyun.com/repository/gradle-plugin")
+		maven(url = "https://mirror.nju.edu.cn/flutter/download.flutter.io/")
 
         google()
     }

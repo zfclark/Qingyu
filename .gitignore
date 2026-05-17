@@ -99,7 +99,7 @@ obj/
 /out/
 
 # VSCode
-.vscode/settings.json
+.vscode/
 
 # User-specific configurations
 .idea/libraries/
@@ -358,3 +358,4 @@ playground.xcworkspace
 build/
 
 # End of https://www.gitignore.io/api/dart,swift,xcode,android,intellij,cocoapods,objective-c,androidstudio
+.vscode/settings.json
