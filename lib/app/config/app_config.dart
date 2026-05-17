@@ -26,13 +26,17 @@ import '../../presentation/pages/word_count/word_count_page.dart';
 import '../../presentation/pages/diff_tools/diff_tools_page.dart';
 import '../../presentation/pages/file_size_tools/file_size_tools_page.dart';
 import '../../presentation/pages/timestamp_tools/timestamp_tools_page.dart';
+import '../../presentation/pages/bmi_calculator/bmi_calculator_page.dart';
+import '../../presentation/pages/pinyin/pinyin_page.dart';
+import '../../presentation/pages/decibel/decibel_page.dart';
+import '../../presentation/pages/device_info/device_info_page.dart';
 
 class AppConfig {
   /// App name
   static const String appName = '清隅';
 
   /// App version
-  static const String appVersion = '1.1.0';
+  static const String appVersion = '1.2.0';
 
   /// Copyright information
   static const String copyright = '© 2026 ZF-Clark';
@@ -223,6 +227,38 @@ class AppConfig {
           'icon': Icons.compare_arrows,
           'description': '长度/重量/温度转换',
           'widget': UnitConverterPage,
+          'color': null,
+        },
+        {
+          'id': 'bmi_calculator',
+          'name': 'BMI 计算',
+          'icon': Icons.monitor_heart,
+          'description': '身体质量指数评估',
+          'widget': BmiCalculatorPage,
+          'color': null,
+        },
+        {
+          'id': 'pinyin',
+          'name': '中文转拼音',
+          'icon': Icons.text_fields,
+          'description': '中文文本转拼音',
+          'widget': PinyinPage,
+          'color': null,
+        },
+        {
+          'id': 'decibel',
+          'name': '分贝检测',
+          'icon': Icons.hearing,
+          'description': '环境噪音检测',
+          'widget': DecibelPage,
+          'color': null,
+        },
+        {
+          'id': 'device_info',
+          'name': '设备信息',
+          'icon': Icons.phone_android,
+          'description': '查看设备硬件与系统信息',
+          'widget': DeviceInfoPage,
           'color': null,
         },
       ],

@@ -21,6 +21,10 @@ import '../encoding_tools/encoding_tools_page.dart';
 import '../number_base_tools/number_base_tools_page.dart';
 import '../hash/hash_calculator_page.dart';
 import '../file_size_tools/file_size_tools_page.dart';
+import '../bmi_calculator/bmi_calculator_page.dart';
+import '../pinyin/pinyin_page.dart';
+import '../decibel/decibel_page.dart';
+import '../device_info/device_info_page.dart';
 import '../regex_tools/regex_tools_page.dart';
 import '../calculator/calculator_page.dart';
 import '../uuid_tools/uuid_tools_page.dart';
@@ -162,6 +166,10 @@ class _HomePageState extends State<HomePage> {
       if (widgetType == TimeScreenPage) return TimeScreenPage();
       if (widgetType == UnitConverterPage) return UnitConverterPage();
       if (widgetType == PingTestPage) return PingTestPage();
+      if (widgetType == BmiCalculatorPage) return BmiCalculatorPage();
+      if (widgetType == PinyinPage) return PinyinPage();
+      if (widgetType == DecibelPage) return DecibelPage();
+      if (widgetType == DeviceInfoPage) return DeviceInfoPage();
       throw Exception('Unknown widget type: $widgetType');
     }
 

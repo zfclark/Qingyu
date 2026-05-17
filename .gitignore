@@ -224,6 +224,9 @@ cmake-build-debug/
 # Trae
 .trae/
 
+# Claude Code
+.claude/
+
 # mpeltonen/sbt-idea plugin
 
 # JIRA plugin
