@@ -34,6 +34,11 @@ import '../qr_code/qr_code_generator_page.dart';
 import '../time_screen/time_screen_page.dart';
 import '../unit_converter/unit_converter_page.dart';
 import '../ping/ping_test_page.dart';
+import '../ip_lookup/ip_lookup_page.dart';
+import '../caesar_cipher/caesar_cipher_page.dart';
+import '../lorem_generator/lorem_generator_page.dart';
+import '../list_sorter/list_sorter_page.dart';
+import '../roman_numeral/roman_numeral_page.dart';
 import 'widgets/collapsible_sidebar.dart';
 import 'widgets/category_drawer.dart';
 import 'widgets/tool_card_widget.dart';
@@ -170,6 +175,11 @@ class _HomePageState extends State<HomePage> {
       if (widgetType == PinyinPage) return PinyinPage();
       if (widgetType == DecibelPage) return DecibelPage();
       if (widgetType == DeviceInfoPage) return DeviceInfoPage();
+      if (widgetType == IpLookupPage) return IpLookupPage();
+      if (widgetType == CaesarCipherPage) return CaesarCipherPage();
+      if (widgetType == LoremGeneratorPage) return LoremGeneratorPage();
+      if (widgetType == ListSorterPage) return ListSorterPage();
+      if (widgetType == RomanNumeralPage) return RomanNumeralPage();
       throw Exception('Unknown widget type: $widgetType');
     }
 

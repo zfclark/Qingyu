@@ -70,7 +70,7 @@ class SearchItemModel {
       icon: map['icon'] as IconData,
       categoryName: categoryName,
       type: type,
-      widget: map['widget'] as Widget?,
+      widget: null,
       statusColor: map['color'] as Color?,
       extraData: map,
     );

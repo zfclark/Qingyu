@@ -8,6 +8,35 @@ import 'package:flutter/material.dart';
 import 'package:qingyu/core/services/search_service.dart';
 import 'package:qingyu/data/models/search_item_model.dart';
 import 'package:qingyu/presentation/pages/home/widgets/tool_chip_widget.dart';
+import '../text_tools/text_tools_page.dart';
+import '../word_count/word_count_page.dart';
+import '../diff_tools/diff_tools_page.dart';
+import '../time_calculator/time_calculator_page.dart';
+import '../timestamp_tools/timestamp_tools_page.dart';
+import '../random_tools/random_tools_page.dart';
+import '../json_tools/json_tools_page.dart';
+import '../encoding_tools/encoding_tools_page.dart';
+import '../number_base_tools/number_base_tools_page.dart';
+import '../hash/hash_calculator_page.dart';
+import '../file_size_tools/file_size_tools_page.dart';
+import '../bmi_calculator/bmi_calculator_page.dart';
+import '../pinyin/pinyin_page.dart';
+import '../decibel/decibel_page.dart';
+import '../device_info/device_info_page.dart';
+import '../regex_tools/regex_tools_page.dart';
+import '../calculator/calculator_page.dart';
+import '../uuid_tools/uuid_tools_page.dart';
+import '../password_tools/password_tools_page.dart';
+import '../color_tools/color_tools_page.dart';
+import '../qr_code/qr_code_generator_page.dart';
+import '../time_screen/time_screen_page.dart';
+import '../unit_converter/unit_converter_page.dart';
+import '../ping/ping_test_page.dart';
+import '../ip_lookup/ip_lookup_page.dart';
+import '../caesar_cipher/caesar_cipher_page.dart';
+import '../lorem_generator/lorem_generator_page.dart';
+import '../list_sorter/list_sorter_page.dart';
+import '../roman_numeral/roman_numeral_page.dart';
 
 /// 搜索页面 - 统一的工具搜索功能
 /// 支持本地工具和在线工具的混合搜索
@@ -807,19 +836,55 @@ class _SearchPageState extends State<SearchPage> {
 
   /// 导航到工具页面
   void _navigateToItem(SearchItemModel item) {
-    if (item.widget != null) {
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => item.widget!),
-      );
-    } else {
-      // 在线工具或暂无实现的工具
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${item.name} 功能开发中...'),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+    if (item.type == SearchItemType.local) {
+      final widgetType = item.extraData?['widget'] as Type?;
+      if (widgetType != null) {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => _createWidget(widgetType)),
+        );
+        return;
+      }
     }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${item.name} 功能开发中...'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  /// 根据Type创建Widget实例
+  Widget _createWidget(Type widgetType) {
+    if (widgetType == TextToolsPage) return TextToolsPage();
+    if (widgetType == WordCountPage) return WordCountPage();
+    if (widgetType == DiffToolsPage) return DiffToolsPage();
+    if (widgetType == TimeCalculatorPage) return TimeCalculatorPage();
+    if (widgetType == TimestampToolsPage) return TimestampToolsPage();
+    if (widgetType == RandomToolsPage) return RandomToolsPage();
+    if (widgetType == JsonToolsPage) return JsonToolsPage();
+    if (widgetType == EncodingToolsPage) return EncodingToolsPage();
+    if (widgetType == NumberBaseToolsPage) return NumberBaseToolsPage();
+    if (widgetType == HashCalculatorPage) return HashCalculatorPage();
+    if (widgetType == FileSizeToolsPage) return FileSizeToolsPage();
+    if (widgetType == RegexToolsPage) return RegexToolsPage();
+    if (widgetType == CalculatorPage) return CalculatorPage();
+    if (widgetType == UuidToolsPage) return UuidToolsPage();
+    if (widgetType == PasswordToolsPage) return PasswordToolsPage();
+    if (widgetType == ColorToolsPage) return ColorToolsPage();
+    if (widgetType == QrCodeGeneratorPage) return QrCodeGeneratorPage();
+    if (widgetType == TimeScreenPage) return TimeScreenPage();
+    if (widgetType == UnitConverterPage) return UnitConverterPage();
+    if (widgetType == PingTestPage) return PingTestPage();
+    if (widgetType == BmiCalculatorPage) return BmiCalculatorPage();
+    if (widgetType == PinyinPage) return PinyinPage();
+    if (widgetType == DecibelPage) return DecibelPage();
+    if (widgetType == DeviceInfoPage) return DeviceInfoPage();
+    if (widgetType == IpLookupPage) return IpLookupPage();
+    if (widgetType == CaesarCipherPage) return CaesarCipherPage();
+    if (widgetType == LoremGeneratorPage) return LoremGeneratorPage();
+    if (widgetType == ListSorterPage) return ListSorterPage();
+    if (widgetType == RomanNumeralPage) return RomanNumeralPage();
+    throw Exception('Unknown widget type: $widgetType');
   }
 
   /// 格式化时间

@@ -30,6 +30,11 @@ import '../../presentation/pages/bmi_calculator/bmi_calculator_page.dart';
 import '../../presentation/pages/pinyin/pinyin_page.dart';
 import '../../presentation/pages/decibel/decibel_page.dart';
 import '../../presentation/pages/device_info/device_info_page.dart';
+import '../../presentation/pages/ip_lookup/ip_lookup_page.dart';
+import '../../presentation/pages/caesar_cipher/caesar_cipher_page.dart';
+import '../../presentation/pages/lorem_generator/lorem_generator_page.dart';
+import '../../presentation/pages/list_sorter/list_sorter_page.dart';
+import '../../presentation/pages/roman_numeral/roman_numeral_page.dart';
 
 class AppConfig {
   /// App name
@@ -113,6 +118,14 @@ class AppConfig {
           'widget': RandomToolsPage,
           'color': null,
         },
+        {
+          'id': 'ip_lookup',
+          'name': 'IP 查询',
+          'icon': Icons.language,
+          'description': 'IP 地址解析与分类',
+          'widget': IpLookupPage,
+          'color': null,
+        },
       ],
 
       // ===== 数据处理 =====
@@ -157,6 +170,22 @@ class AppConfig {
           'widget': FileSizeToolsPage,
           'color': null,
         },
+        {
+          'id': 'caesar_cipher',
+          'name': '凯撒密码',
+          'icon': Icons.lock,
+          'description': '凯撒密码加密解密',
+          'widget': CaesarCipherPage,
+          'color': null,
+        },
+        {
+          'id': 'list_sorter',
+          'name': '列表排序',
+          'icon': Icons.sort,
+          'description': '文本排序与去重',
+          'widget': ListSorterPage,
+          'color': null,
+        },
       ],
 
       // ===== 开发工具 =====
@@ -199,6 +228,22 @@ class AppConfig {
           'icon': Icons.palette,
           'description': 'HEX/RGB/HSL 互转',
           'widget': ColorToolsPage,
+          'color': null,
+        },
+        {
+          'id': 'lorem_generator',
+          'name': 'Lorem 生成',
+          'icon': Icons.text_snippet,
+          'description': '生成占位文本',
+          'widget': LoremGeneratorPage,
+          'color': null,
+        },
+        {
+          'id': 'roman_numeral',
+          'name': '罗马数字',
+          'icon': Icons.numbers,
+          'description': '罗马数字与整数互转',
+          'widget': RomanNumeralPage,
           'color': null,
         },
       ],

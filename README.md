@@ -1,5 +1,7 @@
 # 清隅
 
+![Alt](https://repobeats.axiom.co/api/embed/12028099f6135d7ccc9ebfa0136f89225bd35a46.svg "Repobeats analytics image")
+
 ## 项目概述
 
 清隅是一个功能丰富、界面美观的工具集合，旨在为开发者和个人用户提供便捷高效的日常工具服务。基于 Flutter 框架开发，支持多平台运行，包括 Android、Web 等平台，为用户提供便利的使用体验。
